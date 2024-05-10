@@ -1,0 +1,118 @@
+<mxfile host="app.diagrams.net" modified="2024-05-10T11:41:26.888Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" etag="YiP8Gu3-t2BUAq6Anx-6" version="24.3.1" type="device">
+  <diagram name="Page-1" id="hF5wZVnQ3XBnBF1yejPH">
+    <mxGraphModel dx="1434" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-16" value="SOFTWARE ARCHITECTURE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;gradientColor=#ffd966;strokeColor=#d6b656;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="760" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-22" value="&lt;b&gt;Main&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;gradientColor=#7ea6e0;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="155" y="100" width="540" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-23">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="275" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-23" value="&lt;b&gt;MotorControl&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;gradientColor=#97d077;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="40" y="400" width="470" height="550" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-24" target="ye_fUvGTSHvhhSnnPspm-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-24" value="&lt;b&gt;ObstacleDetection&amp;nbsp;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;gradientColor=#ea6b66;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="650" y="410" width="170" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-28" value="HARDWARE ARCHITECTURE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcd28;gradientColor=#ffa500;strokeColor=#d79b00;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="40" y="970" width="760" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-29" value="&lt;b&gt;Motor Driving Module&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;gradientColor=#97d077;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1090" width="280" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-30" target="ye_fUvGTSHvhhSnnPspm-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-30" value="&lt;b&gt;DC Motor&lt;br&gt;&lt;/b&gt;&lt;br&gt;&lt;div&gt;Used to move the car&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1150" width="110" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-31" target="ye_fUvGTSHvhhSnnPspm-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-31" value="&lt;b&gt;L298N Motor Driver&lt;br&gt;&lt;/b&gt;&lt;br&gt;Used to control the speed and the direction of the motors&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="1150" width="120" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-34" value="&lt;b&gt;Main Controller&lt;br&gt;NUCLEO-F303RE&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;gradientColor=#7ea6e0;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="435" y="1100" width="295" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=0.983;entryY=0.308;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-35" target="ye_fUvGTSHvhhSnnPspm-31">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="350" y="1190" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="510" y="1190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-35" value="PWM" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="1160" width="90" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-37" target="ye_fUvGTSHvhhSnnPspm-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-37" value="GPIO" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="1270" width="90" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-42" value="&lt;b&gt;Obstacle Detection Module&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;gradientColor=#ea6b66;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1360" width="280" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-43" value="&lt;b&gt;Ultrasonic Sensor&lt;br&gt;HC-SR04&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;div&gt;Used to detect the obstacles in front of the car&lt;br&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="110" y="1392.5" width="180" height="97.5" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1.004;entryY=0.264;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-24" target="ye_fUvGTSHvhhSnnPspm-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-51" value="setSpeed()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="470" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-52" value="setDirection()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="550" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-53" value="steerRight()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="710" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-54" value="steerLeft()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="790" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-55" value="stop()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="630" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-56" value="getDistance()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="675" y="520" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-57" value="GPIO_Init()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="340" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-58" value="clockConfig()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="190" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-59" value="timer_Init()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-60" value="start()" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="870" width="250" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-37" target="ye_fUvGTSHvhhSnnPspm-43">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380" y="1300" />
+              <mxPoint x="380" y="1417" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ye_fUvGTSHvhhSnnPspm-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="ye_fUvGTSHvhhSnnPspm-37" target="ye_fUvGTSHvhhSnnPspm-43">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
