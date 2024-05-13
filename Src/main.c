@@ -28,6 +28,7 @@
 #include "Interface/Include/capture_timer_interface.h"
 #include "Interface/Include/gpio_interface.h"
 #include "Interface/Include/uart_interface.h"
+#include "Interface/Include/motor_control_interface.h"
 
 /* USER CODE END Includes */
 
@@ -171,10 +172,31 @@ int main(void)
     	distance = 0.0f;
     }
 
-    sprintf(uartBuf, "Distance in cm is %d\n\r", (int)distance);
+
+    sprintf(uartBuf, "Distance in cm is %d\n\r", + (int)distance);
     uart_transmit(&huart2, (uint8_t* )uartBuf, strlen(uartBuf), 100);
 
     HAL_Delay(100);
+
+    /* DC motor */
+
+    set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+
+    /* forward */
+    TIM2->CCR3 = 950;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
+
+    pwm_start(&htim2, TIM_CHANNEL_3);
+    HAL_Delay(6000);
+    pwm_stop(&htim2, TIM_CHANNEL_3);
+
+    set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, BACKWARDS);
+
+    TIM2->CCR3 = 450;
+
+    pwm_start(&htim2, TIM_CHANNEL_3);
+    HAL_Delay(6000);
+    pwm_stop(&htim2, TIM_CHANNEL_3);
+
   }
   /* USER CODE END 3 */
 }
@@ -242,6 +264,7 @@ static void MX_TIM2_Init(void)
 
   TIM_ClockConfigTypeDef sClockSourceConfig = {0};
   TIM_MasterConfigTypeDef sMasterConfig = {0};
+  TIM_OC_InitTypeDef sConfigOC = {0};
 
   /* USER CODE BEGIN TIM2_Init 1 */
 
@@ -249,7 +272,7 @@ static void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 80-1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 499;
+  htim2.Init.Period = 999;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
@@ -261,15 +284,28 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
+  if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+  {
+    Error_Handler();
+  }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
+  sConfigOC.OCMode = TIM_OCMODE_PWM1;
+  sConfigOC.Pulse = 0;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
+  HAL_TIM_MspPostInit(&htim2);
 
 }
 
@@ -425,6 +461,7 @@ static void MX_GPIO_Init(void)
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, LED_Pin|Trigger_Pin|IN1_Pin, GPIO_PIN_RESET);
