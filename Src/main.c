@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -29,6 +30,7 @@
 #include "Interface/Include/gpio_interface.h"
 #include "Interface/Include/uart_interface.h"
 #include "Interface/Include/motor_control_interface.h"
+#include "OS/Include/os_tasks.h"
 
 /* USER CODE END Includes */
 
@@ -47,6 +49,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
+#define UART_BUFFER_SIZE 200
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -56,6 +60,8 @@ TIM_HandleTypeDef htim4;
 
 UART_HandleTypeDef huart2;
 
+osThreadId defaultTaskHandle;
+osThreadId UartHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -67,6 +73,9 @@ static void MX_USART2_UART_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM2_Init(void);
+void StartDefaultTask(void const * argument);
+void UartTask(void const * argument);
+
 /* USER CODE BEGIN PFP */
 
 void usDelay(uint32_t us);
@@ -79,12 +88,12 @@ void usDelay(uint32_t us);
 const float speed_of_sound = 0.0343 / 2;
 float distance;
 
-uint8_t icFlag = 0;
+volatile uint8_t icFlag = 0;
 uint8_t captureIdx = 0;
 uint32_t firstEdgeTime = 0;
 uint32_t secondEdgeTime = 0;
 
-char uartBuf[200];
+char uartBuf[UART_BUFFER_SIZE];
 
 /* USER CODE END 0 */
 
@@ -124,6 +133,38 @@ int main(void)
 
   /* USER CODE END 2 */
 
+  /* USER CODE BEGIN RTOS_MUTEX */
+  /* add mutexes, ... */
+  /* USER CODE END RTOS_MUTEX */
+
+  /* USER CODE BEGIN RTOS_SEMAPHORES */
+  /* add semaphores, ... */
+  /* USER CODE END RTOS_SEMAPHORES */
+
+  /* USER CODE BEGIN RTOS_TIMERS */
+  /* start timers, add new ones, ... */
+  /* USER CODE END RTOS_TIMERS */
+
+  /* USER CODE BEGIN RTOS_QUEUES */
+  /* add queues, ... */
+  /* USER CODE END RTOS_QUEUES */
+
+  /* Create the thread(s) */
+  /* definition and creation of defaultTask */
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+  /* definition and creation of Uart */
+  osThreadDef(Uart, UartTask, osPriorityNormal, 0, 128);
+  UartHandle = osThreadCreate(osThread(Uart), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+  /* add threads, ... */
+  /* USER CODE END RTOS_THREADS */
+
+  /* Start scheduler */
+  osKernelStart();
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -133,69 +174,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-    /* TRIGGER TO LOW */
-	write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
-    usDelay(5);
-
-    /* Start measurement by outputing a 10 us pulse on the trigger pin */
-    write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_SET);
-    usDelay(10);
-    write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
-
-    /* Pulse width on echo signal */
-    /* we jump into capture timer callback whenever there is a rising edge or a falling edge as we set in the .ioc file*/
-    start_capture_timer(&htim3, TIM_CHANNEL_1);
-
-    uint32_t startTick = HAL_GetTick();
-
-    do
-    {
-    	if (0 != icFlag)
-    	{
-    		break;
-    	}
-    } while( (HAL_GetTick() - startTick) < 500 );  // 500ms timeout value if no capture
-
-    icFlag = 0; /* reset flag */
-    stop_capture_timer(&htim3, TIM_CHANNEL_1);
-
-    /* distance = time * sound_speed / 2 */
-
-    if (secondEdgeTime > firstEdgeTime)
-    {
-    	distance = (secondEdgeTime - firstEdgeTime + 0.0f) * speed_of_sound;
-    }
-
-    else
-    {
-    	distance = 0.0f;
-    }
-
-
-    sprintf(uartBuf, "Distance in cm is %d\n\r", + (int)distance);
-    uart_transmit(&huart2, (uint8_t* )uartBuf, strlen(uartBuf), 100);
-
-    HAL_Delay(100);
-
-    /* DC motor */
-
-    set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
-
-    /* forward */
-    TIM2->CCR3 = 950;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
-
-    pwm_start(&htim2, TIM_CHANNEL_3);
-    HAL_Delay(6000);
-    pwm_stop(&htim2, TIM_CHANNEL_3);
-
-    set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, BACKWARDS);
-
-    TIM2->CCR3 = 450;
-
-    pwm_start(&htim2, TIM_CHANNEL_3);
-    HAL_Delay(6000);
-    pwm_stop(&htim2, TIM_CHANNEL_3);
 
   }
   /* USER CODE END 3 */
@@ -531,6 +509,118 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 }
 
 /* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void const * argument)
+{
+  /* USER CODE BEGIN 5 */
+  /* Infinite loop */
+  for(;;)
+  {
+	  /* TRIGGER TO LOW */
+	  write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
+	  usDelay(5);
+
+	  /* Start measurement by outputing a 10 us pulse on the trigger pin */
+	  write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_SET);
+	  usDelay(10);
+	  write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
+
+	  /* Pulse width on echo signal */
+	  /* we jump into capture timer callback whenever there is a rising edge or a falling edge as we set in the .ioc file*/
+	  start_capture_timer(&htim3, TIM_CHANNEL_1);
+
+	  uint32_t startTick = HAL_GetTick();
+
+	  do
+	  {
+		if (0 != icFlag)
+		{
+			break;
+		}
+	  } while( (HAL_GetTick() - startTick) < 500 );  // 500ms timeout value if no capture
+
+	  icFlag = 0; /* reset flag */
+	  stop_capture_timer(&htim3, TIM_CHANNEL_1);
+
+	  /* distance = time * sound_speed / 2 */
+
+	  if (secondEdgeTime > firstEdgeTime)
+	  {
+		distance = (secondEdgeTime - firstEdgeTime + 0.0f) * speed_of_sound;
+	  }
+
+	  else
+	  {
+		distance = 0.0f;
+	  }
+
+	  sprintf(uartBuf, "Distance in cm is %d\n\r", + (int)distance);
+
+	  /* DC motor */
+
+	  /* forward */
+	  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+
+	  TIM2->CCR3 = 950;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
+
+	  pwm_start(&htim2, TIM_CHANNEL_3);
+	  HAL_Delay(100);
+
+	  osDelay(10);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_UartTask */
+/**
+* @brief Function implementing the Uart thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_UartTask */
+void UartTask(void const * argument)
+{
+  /* USER CODE BEGIN UartTask */
+  /* Infinite loop */
+  for(;;)
+  {
+
+	HandleUartTask(&huart2, (uint8_t* )uartBuf, sizeof(uartBuf), 100);
+
+	HAL_Delay(100);
+
+    osDelay(10);
+  }
+  /* USER CODE END UartTask */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM1 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM1) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
