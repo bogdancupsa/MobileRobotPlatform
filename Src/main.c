@@ -88,7 +88,7 @@ void usDelay(uint32_t us);
 const float speed_of_sound = 0.0343 / 2;
 float distance;
 
-volatile uint8_t icFlag = 0;
+uint8_t icFlag = 0;
 uint8_t captureIdx = 0;
 uint32_t firstEdgeTime = 0;
 uint32_t secondEdgeTime = 0;
@@ -548,6 +548,7 @@ void StartDefaultTask(void const * argument)
 
 	  icFlag = 0; /* reset flag */
 	  stop_capture_timer(&htim3, TIM_CHANNEL_1);
+	  HAL_Delay(50);
 
 	  /* distance = time * sound_speed / 2 */
 
@@ -560,7 +561,7 @@ void StartDefaultTask(void const * argument)
 	  {
 		distance = 0.0f;
 	  }
-
+	  HAL_Delay(50);
 	  sprintf(uartBuf, "Distance in cm is %d\n\r", + (int)distance);
 
 	  /* DC motor */
@@ -571,7 +572,7 @@ void StartDefaultTask(void const * argument)
 	  TIM2->CCR3 = 950;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
 
 	  pwm_start(&htim2, TIM_CHANNEL_3);
-	  HAL_Delay(100);
+	  HAL_Delay(50);
 
 	  osDelay(10);
   }
@@ -592,10 +593,8 @@ void UartTask(void const * argument)
   for(;;)
   {
 
-	HandleUartTask(&huart2, (uint8_t* )uartBuf, sizeof(uartBuf), 100);
-
-	HAL_Delay(100);
-
+	HandleUartTask(&huart2, (uint8_t*)uartBuf, sizeof(uartBuf), 100);
+	HAL_Delay(50);
     osDelay(10);
   }
   /* USER CODE END UartTask */
