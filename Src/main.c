@@ -566,12 +566,20 @@ void StartDefaultTask(void const * argument)
 
 	  /* DC motor */
 
-	  /* forward */
-	  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
-
-	  TIM2->CCR3 = 950;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
+	  if ( (distance == 0) || (distance > 15))
+	  {
+		  /* forward */
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+		  TIM2->CCR3 = 950;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
+	  }
+	  else
+	  {
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, BACKWARDS);
+		  TIM2->CCR3 = 400;
+	  }
 
 	  pwm_start(&htim2, TIM_CHANNEL_3);
+
 	  HAL_Delay(50);
 
 	  osDelay(10);
@@ -592,7 +600,6 @@ void UartTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-
 	HandleUartTask(&huart2, (uint8_t*)uartBuf, sizeof(uartBuf), 100);
 	HAL_Delay(50);
     osDelay(10);
