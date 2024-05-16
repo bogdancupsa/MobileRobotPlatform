@@ -90,12 +90,15 @@ void usDelay(uint32_t us);
 const float speed_of_sound = 0.0343 / 2;
 float distance;
 
-uint8_t icFlag = 0;
-uint8_t captureIdx = 0;
-uint32_t firstEdgeTime = 0;
-uint32_t secondEdgeTime = 0;
+uint8_t  icFlag              = 0;
+uint8_t  captureIdx          = 0;
+uint32_t firstEdgeTime       = 0;
+uint32_t secondEdgeTime      = 0;
+uint16_t right_motor_value   = 0;
+uint16_t left_motor_value    = 0;
+uint8_t  turn_value          = 0;
 
-char uartBuf[UART_BUFFER_SIZE];
+char     uartBuf[UART_BUFFER_SIZE];
 
 /* USER CODE END 0 */
 
@@ -649,20 +652,35 @@ void StartDefaultTask(void const * argument)
 
 	  /* DC motor */
 
-	  if ( (distance == 0) || (distance > 15))
+	  if ( distance > 15 )
 	  {
-		  /* forward */
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, BACKWARDS);
-		  TIM2->CCR3 = 700;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, BACKWARDS);
-		  TIM8->CCR3 = 700;
+		  turn_value = GO;
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
+
+		  TIM2->CCR3 = right_motor_value;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
+		  TIM8->CCR3 = left_motor_value;
+	  }
+	  else if ( (distance > 0) && (distance < 15) )
+	  {
+		  turn_value = STOP;
+
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
+
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
+		  TIM2->CCR3 = right_motor_value;
+		  TIM8->CCR3 = left_motor_value;
 	  }
 	  else
 	  {
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, BACKWARDS);
-		  TIM2->CCR3 = 0;
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, BACKWARDS);
-		  TIM8->CCR3 = 0;
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
+
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
+		  TIM2->CCR3 = right_motor_value;
+		  TIM8->CCR3 = left_motor_value;
 	  }
 
 	  pwm_start(&htim2, TIM_CHANNEL_3);
