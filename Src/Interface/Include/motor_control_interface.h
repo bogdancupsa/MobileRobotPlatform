@@ -12,6 +12,8 @@
 #define GO         2
 #define STOP       3
 
+#define STOP_LIMIT 15
+
 void pwm_start (TIM_HandleTypeDef *htim, uint32_t Channel);
 void pwm_stop  (TIM_HandleTypeDef *htim, uint32_t Channel);
 void set_direction (GPIO_TypeDef* GPIO_1,

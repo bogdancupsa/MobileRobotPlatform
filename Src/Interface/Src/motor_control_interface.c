@@ -44,11 +44,11 @@ void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint1
 	{
 		case TURN_LEFT:
 			*right_motor_value = 990;
-			*left_motor_value = 600;
+			*left_motor_value = 400;
 			break;
 
 		case TURN_RIGHT:
-			*right_motor_value = 600;
+			*right_motor_value = 400;
 			*left_motor_value = 990;
 			break;
 

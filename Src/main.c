@@ -63,6 +63,8 @@ UART_HandleTypeDef huart2;
 
 osThreadId defaultTaskHandle;
 osThreadId UartHandle;
+osThreadId MotorControlHandle;
+osThreadId UltrasonicSensoHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -77,6 +79,8 @@ static void MX_TIM2_Init(void);
 static void MX_TIM8_Init(void);
 void StartDefaultTask(void const * argument);
 void UartTask(void const * argument);
+void MotorControlTask(void const * argument);
+void UltrasonicSensorTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -163,6 +167,14 @@ int main(void)
   /* definition and creation of Uart */
   osThreadDef(Uart, UartTask, osPriorityNormal, 0, 128);
   UartHandle = osThreadCreate(osThread(Uart), NULL);
+
+  /* definition and creation of MotorControl */
+  osThreadDef(MotorControl, MotorControlTask, osPriorityNormal, 0, 128);
+  MotorControlHandle = osThreadCreate(osThread(MotorControl), NULL);
+
+  /* definition and creation of UltrasonicSenso */
+  osThreadDef(UltrasonicSenso, UltrasonicSensorTask, osPriorityNormal, 0, 128);
+  UltrasonicSensoHandle = osThreadCreate(osThread(UltrasonicSenso), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -609,6 +621,99 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
+	  osDelay(1);
+  }
+  /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_UartTask */
+/**
+* @brief Function implementing the Uart thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_UartTask */
+void UartTask(void const * argument)
+{
+  /* USER CODE BEGIN UartTask */
+  /* Infinite loop */
+  for(;;)
+  {
+	HandleUartTask(&huart2, (uint8_t*)uartBuf, sizeof(uartBuf), 100);
+	HAL_Delay(50);
+    osDelay(10);
+  }
+  /* USER CODE END UartTask */
+}
+
+/* USER CODE BEGIN Header_MotorControlTask */
+/**
+* @brief Function implementing the MotorControl thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_MotorControlTask */
+void MotorControlTask(void const * argument)
+{
+  /* USER CODE BEGIN MotorControlTask */
+  /* Infinite loop */
+  for(;;)
+  {
+	  /* DC motor */
+	  if ( distance > STOP_LIMIT )
+	  {
+		  turn_value = GO;
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
+
+		  TIM2->CCR3 = right_motor_value;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
+		  TIM8->CCR3 = left_motor_value;
+	  }
+	  else if ( (distance > 0) && (distance < STOP_LIMIT) )
+	  {
+		  turn_value = STOP;
+
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
+
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
+		  TIM2->CCR3 = right_motor_value;
+		  TIM8->CCR3 = left_motor_value;
+	  }
+	  else
+	  {
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
+
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
+		  TIM2->CCR3 = right_motor_value;
+		  TIM8->CCR3 = left_motor_value;
+	  }
+
+	  pwm_start(&htim2, TIM_CHANNEL_3);
+	  pwm_start(&htim8, TIM_CHANNEL_3);
+
+	  HAL_Delay(50);
+
+	  osDelay(10);
+  }
+  /* USER CODE END MotorControlTask */
+}
+
+/* USER CODE BEGIN Header_UltrasonicSensorTask */
+/**
+* @brief Function implementing the UltrasonicSenso thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_UltrasonicSensorTask */
+void UltrasonicSensorTask(void const * argument)
+{
+  /* USER CODE BEGIN UltrasonicSensorTask */
+  /* Infinite loop */
+  for(;;)
+  {
 	  /* TRIGGER TO LOW */
 	  write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
 	  usDelay(5);
@@ -647,70 +752,13 @@ void StartDefaultTask(void const * argument)
 	  {
 		distance = 0.0f;
 	  }
+
 	  HAL_Delay(50);
 	  sprintf(uartBuf, "Distance in cm is %d\n\r", + (int)distance);
 
-	  /* DC motor */
-
-	  if ( distance > 15 )
-	  {
-		  turn_value = GO;
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
-
-		  TIM2->CCR3 = right_motor_value;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
-		  TIM8->CCR3 = left_motor_value;
-	  }
-	  else if ( (distance > 0) && (distance < 15) )
-	  {
-		  turn_value = STOP;
-
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
-
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
-		  TIM2->CCR3 = right_motor_value;
-		  TIM8->CCR3 = left_motor_value;
-	  }
-	  else
-	  {
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, FORWARD);
-
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value);
-		  TIM2->CCR3 = right_motor_value;
-		  TIM8->CCR3 = left_motor_value;
-	  }
-
-	  pwm_start(&htim2, TIM_CHANNEL_3);
-	  pwm_start(&htim8, TIM_CHANNEL_3);
-
-	  HAL_Delay(50);
-
 	  osDelay(10);
   }
-  /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_UartTask */
-/**
-* @brief Function implementing the Uart thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_UartTask */
-void UartTask(void const * argument)
-{
-  /* USER CODE BEGIN UartTask */
-  /* Infinite loop */
-  for(;;)
-  {
-	HandleUartTask(&huart2, (uint8_t*)uartBuf, sizeof(uartBuf), 100);
-	HAL_Delay(50);
-    osDelay(10);
-  }
-  /* USER CODE END UartTask */
+  /* USER CODE END UltrasonicSensorTask */
 }
 
 /**
