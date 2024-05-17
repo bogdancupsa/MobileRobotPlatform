@@ -25,6 +25,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "Interface/Include/capture_timer_interface.h"
 #include "Interface/Include/gpio_interface.h"
@@ -64,7 +65,7 @@ UART_HandleTypeDef huart2;
 osThreadId defaultTaskHandle;
 osThreadId UartHandle;
 osThreadId MotorControlHandle;
-osThreadId UltrasonicSensoHandle;
+osThreadId RightUltrasonicHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -80,7 +81,7 @@ static void MX_TIM8_Init(void);
 void StartDefaultTask(void const * argument);
 void UartTask(void const * argument);
 void MotorControlTask(void const * argument);
-void UltrasonicSensorTask(void const * argument);
+void RightUltrasonicSensorTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -91,8 +92,10 @@ void usDelay(uint32_t us);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+SemaphoreHandle_t mutex_rightSensor;
+
 const float speed_of_sound = 0.0343 / 2;
-float distance;
+int distanceRightSensor;
 
 uint8_t  icFlag              = 0;
 uint8_t  captureIdx          = 0;
@@ -141,6 +144,15 @@ int main(void)
   MX_TIM8_Init();
   /* USER CODE BEGIN 2 */
 
+//  distanceRightSensor = (int*)malloc(sizeof(int));
+//  if (distanceRightSensor == NULL)
+//  {
+//	  Error_Handler();
+//  }
+  distanceRightSensor = 0;
+
+  mutex_rightSensor = xSemaphoreCreateMutex();
+
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -172,9 +184,9 @@ int main(void)
   osThreadDef(MotorControl, MotorControlTask, osPriorityNormal, 0, 128);
   MotorControlHandle = osThreadCreate(osThread(MotorControl), NULL);
 
-  /* definition and creation of UltrasonicSenso */
-  osThreadDef(UltrasonicSenso, UltrasonicSensorTask, osPriorityNormal, 0, 128);
-  UltrasonicSensoHandle = osThreadCreate(osThread(UltrasonicSenso), NULL);
+  /* definition and creation of RightUltrasonic */
+  osThreadDef(RightUltrasonic, RightUltrasonicSensorTask, osPriorityNormal, 0, 128);
+  RightUltrasonicHandle = osThreadCreate(osThread(RightUltrasonic), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -656,11 +668,18 @@ void UartTask(void const * argument)
 void MotorControlTask(void const * argument)
 {
   /* USER CODE BEGIN MotorControlTask */
+  int value_for_right_distance_sensor = 0;
   /* Infinite loop */
   for(;;)
   {
 	  /* DC motor */
-	  if ( distance > STOP_LIMIT )
+	  xSemaphoreTake(mutex_rightSensor, portMAX_DELAY);
+
+	  value_for_right_distance_sensor = distanceRightSensor;
+
+	  xSemaphoreGive(mutex_rightSensor);
+
+	  if ( value_for_right_distance_sensor > STOP_LIMIT )
 	  {
 		  turn_value = GO;
 		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, FORWARD);
@@ -670,7 +689,7 @@ void MotorControlTask(void const * argument)
 		  TIM2->CCR3 = right_motor_value;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
 		  TIM8->CCR3 = left_motor_value;
 	  }
-	  else if ( (distance > 0) && (distance < STOP_LIMIT) )
+	  else if ( (value_for_right_distance_sensor > 0) && (value_for_right_distance_sensor < STOP_LIMIT) )
 	  {
 		  turn_value = STOP;
 
@@ -701,16 +720,17 @@ void MotorControlTask(void const * argument)
   /* USER CODE END MotorControlTask */
 }
 
-/* USER CODE BEGIN Header_UltrasonicSensorTask */
+/* USER CODE BEGIN Header_RightUltrasonicSensorTask */
 /**
-* @brief Function implementing the UltrasonicSenso thread.
+* @brief Function implementing the RightUltrasonic thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_UltrasonicSensorTask */
-void UltrasonicSensorTask(void const * argument)
+/* USER CODE END Header_RightUltrasonicSensorTask */
+void RightUltrasonicSensorTask(void const * argument)
 {
-  /* USER CODE BEGIN UltrasonicSensorTask */
+  /* USER CODE BEGIN RightUltrasonicSensorTask */
+  int calculated_distance_for_right_sensor;
   /* Infinite loop */
   for(;;)
   {
@@ -745,20 +765,26 @@ void UltrasonicSensorTask(void const * argument)
 
 	  if (secondEdgeTime > firstEdgeTime)
 	  {
-		distance = (secondEdgeTime - firstEdgeTime + 0.0f) * speed_of_sound;
+		calculated_distance_for_right_sensor = (int)( (secondEdgeTime - firstEdgeTime + 0.0f) * speed_of_sound );
 	  }
 
 	  else
 	  {
-		distance = 0.0f;
+		calculated_distance_for_right_sensor = 0;
 	  }
 
+	  xSemaphoreTake(mutex_rightSensor, portMAX_DELAY);
+
+	  distanceRightSensor = calculated_distance_for_right_sensor;
+
+	  xSemaphoreGive(mutex_rightSensor);
+
 	  HAL_Delay(50);
-	  sprintf(uartBuf, "Distance in cm is %d\n\r", + (int)distance);
+	  sprintf(uartBuf, "Distance in cm is %d\n\r", + calculated_distance_for_right_sensor);
 
 	  osDelay(10);
   }
-  /* USER CODE END UltrasonicSensorTask */
+  /* USER CODE END RightUltrasonicSensorTask */
 }
 
 /**
