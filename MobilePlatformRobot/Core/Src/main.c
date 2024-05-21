@@ -21,7 +21,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "MotorsControlService.h"
+#include "ObstacleDetection.h"
+#include "PathMapping.h"
+#include "Sensordatacapture.h"
+#include "TimersConf.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -45,24 +49,9 @@ TIM_HandleTypeDef htim1;
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 
-UART_HandleTypeDef huart1;
-
 /* USER CODE BEGIN PV */
 
 
-/* Captured Values */
-uint32_t               uwIC2Value1 = 0;
-uint32_t               uwIC2Value2 = 0;
-uint32_t               uwDiffCapture = 0;
-
-/* Capture index */
-uint16_t               uhCaptureIndex = 0;
-
-/* Frequency Value */
-uint32_t               uwFrequency = 0;
-
-
-uint8_t Data[] = "Distance = ";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -71,94 +60,14 @@ static void MX_GPIO_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
-static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void delay_us (uint16_t us)
-{
-	__HAL_TIM_SET_COUNTER(&htim3,0);  // set the counter value a 0
-	while (__HAL_TIM_GET_COUNTER(&htim3) < us);  // wait for the counter to reach the us input in the parameter
-}
 
-void HCSR04_Read (void)
-{
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);// pull the TRIG pin HIGH
-	delay_us(10);  // wait for 10 us
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET);  // pull the TRIG pin low
 
-	__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1);
-}
-
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
-  {
-    if(uhCaptureIndex == 0)
-    {
-      /* Get the 1st Input Capture value */
-      uwIC2Value1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-      uhCaptureIndex = 1;
-    }
-    else if(uhCaptureIndex == 1)
-    {
-      /* Get the 2nd Input Capture value */
-      uwIC2Value2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
-
-      /* Capture computation */
-      if (uwIC2Value2 > uwIC2Value1)
-      {
-        uwDiffCapture = (uwIC2Value2 - uwIC2Value1);
-      }
-      else if (uwIC2Value2 < uwIC2Value1)
-      {
-        /* 0xFFFF is max TIM1_CCRx value */
-        uwDiffCapture = ((0xFFFF - uwIC2Value1) + uwIC2Value2) + 1;
-      }
-      else
-      {
-        /* If capture values are equal, we have reached the limit of frequency
-           measures */
-        Error_Handler();
-      }
-
-      Distance = Difference * .034/2;
-
-      HAL_UART_Transmit(&huart2, data,sizeof(data), 60);
-      __HAL_TIM_DISABLE_IT(&htim1, TIM_IT_CC1);
-    }
-  }
-}
-
-void Set_PWM_Pulse(TIM_HandleTypeDef *htim,uint32_t channel, uint32_t pulse)
-{
-	switch (Channel)
-	{
-		case TIM_CHANNEL_1:
-			htim.Instance->CCR1 = pulse;
-			break;
-		case TIM_CHANNEL_2:
-			htim.Instance->CCR2 = pulse;
-			break;
-		case TIM_CHANNEL_3:
-			htim.Instance->CCR3 = pulse;
-			break;
-		case TIM_CHANNEL_4:
-			htim.Instance->CCR4 = pulse;
-			break;
-		case TIM_CHANNEL_5:
-			htim.Instance->CCR5 = pulse;
-			break;
-		case TIM_CHANNEL_6:
-			htim.Instance->CCR6 = pulse;
-			break;
-		default:
-		    break;
-	}
-}
 /* USER CODE END 0 */
 
 /**
@@ -193,29 +102,11 @@ int main(void)
   MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
-  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  /*Start PWM for TIM2 channel 1 for motor*/
-  if(HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1)!= HAL_OK)
-  {
-	  /* Starting Error */
-	  Error_Handler();
-  }
 
-  /*Start the Input Capture in interrupt mode for sensor*/
-   if(HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK)
-   {
- 	  /* Starting Error */
- 	  Error_Handler();
-   }
+  Timers_Configuration();
 
-   /*Timer configured at 1MHz */
-   if(HAL_TIM_Base_Start(&htim1)  != HAL_OK)
-   {
-	   /* Starting Error */
-	   Error_Handler();
-   }
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -225,13 +116,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);//IN1
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);//IN2
-	  Set_PWM_Pulse(&htim2, TIM_CHANNEL_1,624);
-
-
+	  MCS_MainFunction();
 	  HCSR04_Read();
-
 
   }
   /* USER CODE END 3 */
@@ -388,6 +274,10 @@ static void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN TIM2_Init 2 */
 
   /* USER CODE END TIM2_Init 2 */
@@ -441,41 +331,6 @@ static void MX_TIM3_Init(void)
 }
 
 /**
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
-
-  /* USER CODE BEGIN USART1_Init 0 */
-
-  /* USER CODE END USART1_Init 0 */
-
-  /* USER CODE BEGIN USART1_Init 1 */
-
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
-  huart1.Init.StopBits = UART_STOPBITS_1;
-  huart1.Init.Parity = UART_PARITY_NONE;
-  huart1.Init.Mode = UART_MODE_TX_RX;
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
-  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init(&huart1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
-
-  /* USER CODE END USART1_Init 2 */
-
-}
-
-/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -488,16 +343,27 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, IN1_MOTOR1_Pin|IN2_MOTOR1_Pin|TRIG_SEN1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PA4 PA5 PA6 */
-  GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, IN1_MOTOR2_Pin|IN2_MOTOR2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : IN1_MOTOR1_Pin IN2_MOTOR1_Pin TRIG_SEN1_Pin */
+  GPIO_InitStruct.Pin = IN1_MOTOR1_Pin|IN2_MOTOR1_Pin|TRIG_SEN1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : IN1_MOTOR2_Pin IN2_MOTOR2_Pin */
+  GPIO_InitStruct.Pin = IN1_MOTOR2_Pin|IN2_MOTOR2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
