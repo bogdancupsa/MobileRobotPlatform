@@ -11,9 +11,10 @@
 
 /* Private defines ------------------------------------------------------------*/
 #define SENSOR_DEFAULT_DISTANCE 20
+#define SENSOR_SPEED_MASK 0.034
 
 /* Private variables ---------------------------------------------------------*/
-const SENDATA_TypeDef SensorMapping[3] =
+const SenData_TypeDef SensorMapping[3] =
 {
 		{POS_FR, SENSOR_DEFAULT_DISTANCE},
 		{POS_FL, SENSOR_DEFAULT_DISTANCE},
@@ -45,6 +46,11 @@ void HCSR04_Read (void)
 	__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1);
 }
 
+/**
+  * @brief  Conversion complete callback in non blocking mode
+  * @param  htim : hadc handle
+  * @retval None
+  */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 	uint16_t data_len = 0;
@@ -81,8 +87,10 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 			}
 
 
-			Distance = uwDiffCapture * 0.034/2;
+			Distance = (uwDiffCapture * SENSOR_SPEED_MASK)/2;
 
+			SensorMapping[1].Value = Distance;
+			SensorMapping[1].orientation = POS_FR;
 
 
 		}
@@ -90,7 +98,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 }
 
 
-HAL_StatusTypeDef Get_SensorData_Mapping(SENDATA_TypeDef *mapping)
+HAL_StatusTypeDef Get_SensorData_Mapping(SenData_TypeDef *mapping)
 {
 	if(SensorMappingDone == TRUE)
 	{

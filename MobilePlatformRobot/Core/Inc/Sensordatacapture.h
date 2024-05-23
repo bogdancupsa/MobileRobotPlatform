@@ -17,14 +17,14 @@ typedef enum{
 	POS_FL, /*Front Left*/
 	POS_BR, /*Back Right*/
 	POS_BL, /*Back Left*/
-}SENPOS_TypeDef;
+}SenPos_TypeDef;
 
 typedef struct
 {
-	SENPOS_TypeDef orientation;	/* the position of the sensor*/
+	SenPos_TypeDef orientation;	/* the position of the sensor*/
 	uint16_t Value;         /*Distance Value captured */
 
-} SENDATA_TypeDef;
+} SenData_TypeDef;
 
 
 /* Exported constants --------------------------------------------------------*/
@@ -36,6 +36,6 @@ typedef struct
 
 void HCSR04_Read (void);
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
-HAL_StatusTypeDef Get_SensorData_Mapping(SENDATA_TypeDef *mapping);
+HAL_StatusTypeDef Get_SensorData_Mapping(SenData_TypeDef *mapping);
 
 #endif /* SRC_SENSORDATACAPTURE_H_ */

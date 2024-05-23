@@ -33,5 +33,7 @@ typedef enum{
 /* Exported functions prototypes ---------------------------------------------*/
 HAL_StatusTypeDef MCS_Init(void);
 void MCS_MainFunction(void);
+void MCS_SetDirection(MCS_Direction_TypeDef Direction);
+void Mcs_SetState(MCS_State_TypeDef state);
 
 #endif /* SRC_MOTORSCONTROLSERVICE_H_ */

@@ -11,7 +11,11 @@
 
 
 /* Exported types ------------------------------------------------------------*/
-
+typedef struct
+{
+	boolean OBSTACLE_FR;
+	boolean OBSTACLE_FL;
+}ObstacleState_Typedef;
 
 /* Exported constants --------------------------------------------------------*/
 
