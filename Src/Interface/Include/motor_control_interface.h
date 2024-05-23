@@ -12,16 +12,22 @@
 #define GO         2
 #define STOP       3
 
-#define STOP_LIMIT 15
+#define STOP_LIMIT 10
 
 void pwm_start (TIM_HandleTypeDef *htim, uint32_t Channel);
+
 void pwm_stop  (TIM_HandleTypeDef *htim, uint32_t Channel);
+
 void set_direction (GPIO_TypeDef* GPIO_1,
 		            uint16_t GPIO_Pin_1,
 					GPIO_TypeDef* GPIO_2,
 					uint16_t GPIO_Pin_2,
 					uint8_t direction);
 
-void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint16_t* left_motor_value);
+void set_turn_values (uint8_t turn_direction,
+		              uint16_t* right_motor_value,
+					  uint16_t* left_motor_value,
+					  uint8_t* direction_1_2,
+					  uint8_t* direction_3_4);
 
 #endif // MOTOR_CONTROL_H

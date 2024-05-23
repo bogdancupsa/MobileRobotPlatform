@@ -38,31 +38,49 @@ void set_direction (GPIO_TypeDef* GPIO_1,
 	}
 }
 
-void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint16_t* left_motor_value)
+void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint16_t* left_motor_value, uint8_t* direction_1_2, uint8_t* direction_3_4)
 {
 	switch (turn_direction)
 	{
 		case TURN_LEFT:
-			*right_motor_value = 990;
-			*left_motor_value = 400;
+
+			*direction_1_2 = BACKWARDS;
+			*direction_3_4 = FORWARD;
+
+			*right_motor_value = 1690;
+			*left_motor_value = 1990;
 			break;
 
 		case TURN_RIGHT:
-			*right_motor_value = 400;
-			*left_motor_value = 990;
+
+			*direction_1_2 = FORWARD;
+			*direction_3_4 = BACKWARDS;
+
+			*right_motor_value = 1690;
+			*left_motor_value = 1990;
 			break;
 
 		case GO:
-			*right_motor_value = 990;
-			*left_motor_value = 990;
+
+			*direction_1_2 = FORWARD;
+			*direction_3_4 = FORWARD;
+
+			*right_motor_value = 1690;
+			*left_motor_value = 1990;
 			break;
 
 		case STOP:
+			*direction_1_2 = FORWARD;
+			*direction_3_4 = FORWARD;
+
 			*right_motor_value = 0;
 			*left_motor_value = 0;
 			break;
 
 		default:
+			*direction_1_2 = FORWARD;
+			*direction_3_4 = FORWARD;
+
 			*right_motor_value = 0;
 			*left_motor_value = 0;
 			break;
