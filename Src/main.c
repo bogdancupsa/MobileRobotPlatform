@@ -97,15 +97,17 @@ SemaphoreHandle_t mutex_frontSensor;
 const float speed_of_sound = 0.0343 / 2;
 int distanceFrontSensor;
 
-uint8_t  icFlag              = 0;
-uint8_t  captureIdx          = 0;
-uint32_t firstEdgeTime       = 0;
-uint32_t secondEdgeTime      = 0;
-uint16_t right_motor_value   = 0;
-uint16_t left_motor_value    = 0;
-uint8_t  turn_value          = 0;
-uint8_t  direction_1_2       = STOP;
-uint8_t  direction_3_4       = STOP;
+uint8_t  icFlag                 = 0;
+uint8_t  captureIdx             = 0;
+uint32_t firstEdgeTime          = 0;
+uint32_t secondEdgeTime         = 0;
+uint16_t right_motor_value      = 0;
+uint16_t left_motor_value       = 0;
+uint8_t  turn_value             = 0;
+uint8_t  direction_left_front   = FORWARD;
+uint8_t  direction_right_front  = FORWARD;
+uint8_t  direction_left_rear    = FORWARD;
+uint8_t  direction_right_rear   = FORWARD;
 
 char     uartBuf[UART_BUFFER_SIZE];
 
@@ -308,6 +310,14 @@ static void MX_TIM2_Init(void)
   sConfigOC.Pulse = 0;
   sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
   if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
@@ -547,10 +557,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, LED_Pin|Trigger_Pin|IN1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, IN4REAR_Pin|IN1REAR_Pin|IN2REAR_Pin|IN3REAR_Pin
+                          |IN4_Pin|IN3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, IN4_Pin|IN3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : BUTTON_Pin */
   GPIO_InitStruct.Pin = BUTTON_Pin;
@@ -565,19 +576,21 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+  /*Configure GPIO pins : IN4REAR_Pin IN1REAR_Pin IN2REAR_Pin IN3REAR_Pin
+                           IN4_Pin IN3_Pin */
+  GPIO_InitStruct.Pin = IN4REAR_Pin|IN1REAR_Pin|IN2REAR_Pin|IN3REAR_Pin
+                          |IN4_Pin|IN3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
   /*Configure GPIO pin : IN2_Pin */
   GPIO_InitStruct.Pin = IN2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(IN2_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : IN4_Pin IN3_Pin */
-  GPIO_InitStruct.Pin = IN4_Pin|IN3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
@@ -685,39 +698,64 @@ void MotorControlTask(void const * argument)
 	  {
 		  turn_value = GO;
 
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_1_2, &direction_3_4);
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_left_front, &direction_right_front, &direction_left_rear, &direction_right_rear);
 
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_1_2);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_3_4);
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_right_front);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_left_front);
 
-		  TIM2->CCR3 = right_motor_value;  /* ARR = 999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
+		  set_direction(IN1REAR_GPIO_Port, IN1REAR_Pin, IN2REAR_GPIO_Port, IN2REAR_Pin, direction_left_rear);
+		  set_direction(IN3REAR_GPIO_Port, IN3REAR_Pin, IN4REAR_GPIO_Port, IN4REAR_Pin, direction_right_rear);
+
+		  TIM2->CCR3 = right_motor_value;  /* ARR = 1999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
 		  TIM8->CCR3 = left_motor_value;
+
+		  TIM2->CCR1 = left_motor_value;
+		  TIM2->CCR2 = right_motor_value;
 	  }
 	  else if ( (value_for_front_distance_sensor > 0) && (value_for_front_distance_sensor < STOP_LIMIT) )
 	  {
-		  turn_value = TURN_LEFT;
+		  turn_value = TURN_RIGHT;
 
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_1_2, &direction_3_4);
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_left_front, &direction_right_front, &direction_left_rear, &direction_right_rear);
 
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_1_2);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_3_4);
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_right_front);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_left_front);
+
+		  set_direction(IN1REAR_GPIO_Port, IN1REAR_Pin, IN2REAR_GPIO_Port, IN2REAR_Pin, direction_left_rear);
+		  set_direction(IN3REAR_GPIO_Port, IN3REAR_Pin, IN4REAR_GPIO_Port, IN4REAR_Pin, direction_right_rear);
 
 		  TIM2->CCR3 = right_motor_value;
 		  TIM8->CCR3 = left_motor_value;
+
+		  TIM2->CCR1 = left_motor_value;
+		  TIM2->CCR2 = right_motor_value;
+
+		  HAL_Delay(1000);
 	  }
 	  else
 	  {
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_1_2, &direction_3_4);
+		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_left_front, &direction_right_front, &direction_left_rear, &direction_right_rear);
 
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_1_2);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_3_4);
+		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_right_front);
+		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_left_front);
+
+		  set_direction(IN1REAR_GPIO_Port, IN1REAR_Pin, IN2REAR_GPIO_Port, IN2REAR_Pin, direction_left_rear);
+		  set_direction(IN3REAR_GPIO_Port, IN3REAR_Pin, IN4REAR_GPIO_Port, IN4REAR_Pin, direction_right_rear);
 
 		  TIM2->CCR3 = right_motor_value;
 		  TIM8->CCR3 = left_motor_value;
+
+		  TIM2->CCR1 = left_motor_value;
+		  TIM2->CCR2 = right_motor_value;
 	  }
 
+	  /* front */
 	  pwm_start(&htim2, TIM_CHANNEL_3);
 	  pwm_start(&htim8, TIM_CHANNEL_3);
+
+	  /* rear */
+	  pwm_start(&htim2, TIM_CHANNEL_1);
+	  pwm_start(&htim2, TIM_CHANNEL_2);
 
 	  HAL_Delay(50);
 

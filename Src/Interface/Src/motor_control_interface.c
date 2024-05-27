@@ -38,48 +38,58 @@ void set_direction (GPIO_TypeDef* GPIO_1,
 	}
 }
 
-void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint16_t* left_motor_value, uint8_t* direction_1_2, uint8_t* direction_3_4)
+void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint16_t* left_motor_value, uint8_t* direction_left_front, uint8_t* direction_right_front, uint8_t* direction_left_rear, uint8_t* direction_right_rear)
 {
 	switch (turn_direction)
 	{
 		case TURN_LEFT:
 
-			*direction_1_2 = BACKWARDS;
-			*direction_3_4 = FORWARD;
+			*direction_left_front = BACKWARDS;
+			*direction_right_front = FORWARD;
+			*direction_left_rear = BACKWARDS;
+			*direction_right_rear = FORWARD;
 
-			*right_motor_value = 1690;
-			*left_motor_value = 1990;
+			*right_motor_value = 790;
+			*left_motor_value = 790;
 			break;
 
 		case TURN_RIGHT:
 
-			*direction_1_2 = FORWARD;
-			*direction_3_4 = BACKWARDS;
+			*direction_left_front = FORWARD;
+			*direction_right_front = BACKWARDS;
+			*direction_left_rear = FORWARD;
+			*direction_right_rear = BACKWARDS;
 
-			*right_motor_value = 1690;
-			*left_motor_value = 1990;
+			*right_motor_value = 1200;
+			*left_motor_value = 1200;
 			break;
 
 		case GO:
 
-			*direction_1_2 = FORWARD;
-			*direction_3_4 = FORWARD;
+			*direction_left_front = FORWARD;
+			*direction_right_front = FORWARD;
+			*direction_left_rear = FORWARD;
+			*direction_right_rear = FORWARD;
 
-			*right_motor_value = 1690;
-			*left_motor_value = 1990;
+			*right_motor_value = 1000;
+			*left_motor_value = 1000;
 			break;
 
 		case STOP:
-			*direction_1_2 = FORWARD;
-			*direction_3_4 = FORWARD;
+			*direction_left_front = FORWARD;
+			*direction_right_front = FORWARD;
+			*direction_left_rear = FORWARD;
+			*direction_right_rear = FORWARD;
 
 			*right_motor_value = 0;
 			*left_motor_value = 0;
 			break;
 
 		default:
-			*direction_1_2 = FORWARD;
-			*direction_3_4 = FORWARD;
+			*direction_left_front = FORWARD;
+			*direction_right_front = FORWARD;
+			*direction_left_rear = FORWARD;
+			*direction_right_rear = FORWARD;
 
 			*right_motor_value = 0;
 			*left_motor_value = 0;
