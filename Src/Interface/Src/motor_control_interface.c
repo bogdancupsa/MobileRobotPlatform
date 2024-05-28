@@ -49,8 +49,9 @@ void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint1
 			*direction_left_rear = BACKWARDS;
 			*direction_right_rear = FORWARD;
 
-			*right_motor_value = 790;
-			*left_motor_value = 790;
+			/* 60% fill factor */
+			*right_motor_value = 1200;
+			*left_motor_value = 1200;
 			break;
 
 		case TURN_RIGHT:
@@ -60,6 +61,7 @@ void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint1
 			*direction_left_rear = FORWARD;
 			*direction_right_rear = BACKWARDS;
 
+			/* 60% fill factor */
 			*right_motor_value = 1200;
 			*left_motor_value = 1200;
 			break;
@@ -71,6 +73,7 @@ void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint1
 			*direction_left_rear = FORWARD;
 			*direction_right_rear = FORWARD;
 
+			/* 50% fill factor */
 			*right_motor_value = 1000;
 			*left_motor_value = 1000;
 			break;
@@ -81,6 +84,7 @@ void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint1
 			*direction_left_rear = FORWARD;
 			*direction_right_rear = FORWARD;
 
+			/* 0% fill factor */
 			*right_motor_value = 0;
 			*left_motor_value = 0;
 			break;
@@ -91,6 +95,7 @@ void set_turn_values (uint8_t turn_direction, uint16_t* right_motor_value, uint1
 			*direction_left_rear = FORWARD;
 			*direction_right_rear = FORWARD;
 
+			/* 0% fill factor */
 			*right_motor_value = 0;
 			*left_motor_value = 0;
 			break;
