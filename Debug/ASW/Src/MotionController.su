@@ -1,0 +1,2 @@
+../ASW/Src/MotionController.c:12:6:read_map	4	static
+../ASW/Src/MotionController.c:20:6:write_updated_pos	4	static

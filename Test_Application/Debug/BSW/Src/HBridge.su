@@ -1,0 +1,4 @@
+../BSW/Src/HBridge.c:16:6:HBridge_MotorControl	24	static
+../BSW/Src/HBridge.c:75:6:HBridge_MotorStop	16	static
+../BSW/Src/HBridge.c:100:6:HBridge_PinConfig	4	static
+../BSW/Src/HBridge.c:109:6:AdjustDutyCycle	16	static

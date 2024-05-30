@@ -8,6 +8,7 @@
 #ifndef INC_SENSORMAPPING_H_
 #define INC_SENSORMAPPING_H_
 
+/*
 typedef struct
 {
 	uint8_t Detection;
@@ -26,6 +27,7 @@ typedef struct
 }SensorsPosition_t;
 
 
+*/
 
 
 #endif /* INC_SENSORMAPPING_H_ */

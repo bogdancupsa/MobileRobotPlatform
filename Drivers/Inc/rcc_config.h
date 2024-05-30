@@ -9,17 +9,24 @@
 #define INC_RCC_CONFIG_H_
 
 #include "stm32f446re.h"
+/*************************************************************************************************************************************************/
+void SysClockConfig(void);
 
+/*************************************************************************************************************************************************/
 
 /**  RCC_Oscillator_Type Oscillator Type
   */
 #define RCC_OSCILLATORTYPE_HSE             0x00000001U
 #define RCC_OSCILLATORTYPE_HSI             0x00000002U
 
-
 /**  RCC_HSI_Config HSI Config
   */
 #define RCC_HSI_ON                       ((uint8_t)0x01)
+
+/** RCC_HSE_Config HSE Config
+  */
+#define RCC_HSE_OFF                      0x00000000U
+#define RCC_HSE_ON                       RCC_CR_HSEON
 
 #define RCC_HSICALIBRATION_DEFAULT       0x10U         /* Default HSI calibration trimming value */
 
@@ -152,36 +159,6 @@ typedef struct
 
 }RCC_ClkInit_t;
 
-
-
-
-#define RCC_PWR_CLK_ENABLE()      do { __vo uint32_t tmpreg = 0x00U; \
-                                       SET_BIT(RCC->APB1ENR, RCC_APB1ENR_PWREN);\
-                                       /* Delay after an RCC peripheral clock enabling */ \
-                                       tmpreg = READ_BIT(RCC->APB1ENR, RCC_APB1ENR_PWREN);\
-                                       (void)tmpreg; } while(0U)
-
-/** @brief  macros configure the main internal regulator output voltage.
-  * @param  __REGULATOR__ specifies the regulator output voltage to achieve
-  *         a tradeoff between performance and power consumption when the device does
-  *         not operate at the maximum frequency (refer to the datasheets for more details).
-  *          This parameter can be one of the following values:
-  *            @arg PWR_REGULATOR_VOLTAGE_SCALE1: Regulator voltage output Scale 1 mode
-  *            @arg PWR_REGULATOR_VOLTAGE_SCALE2: Regulator voltage output Scale 2 mode
-  *            @arg PWR_REGULATOR_VOLTAGE_SCALE3: Regulator voltage output Scale 3 mode
-  * @retval None
-  */
-#define PWR_VOLTAGESCALING_CONFIG(__REGULATOR__) do {                                                     \
-															__vo uint32_t tmpreg = 0x00U;                        \
-                                                           /* MODIFY_REG(PWR->CR, PWR_CR_VOS, (__REGULATOR__)); */  \
-                                                            /* Delay after an RCC peripheral clock enabling */  \
-                                                          /*  tmpreg = READ_BIT(PWR->CR, PWR_CR_VOS);     */        \
-                                                            (void)tmpreg;                                     \
-                                                          } while(0U)
-
-
-#define PWR_REGULATOR_VOLTAGE_SCALE1         PWR_CR_VOS             /* Scale 1 mode(default value at reset): the maximum value of fHCLK is 168 MHz. It can be extended to
-                                                                       180 MHz by activating the over-drive mode. */
 
 
 

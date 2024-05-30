@@ -12,6 +12,7 @@
  *					                 									APIs
  *
  *************************************************************************************************************************************************/
+/*
 void DrivingAPIs_StraightLineMove( Wheels_t Wheel, MoveDir_t Direction, uint8_t Speed, uint8_t Distance);
 void DrivingAPIs_TurnMove(MoveDir_t Direction, uint8_t Angle, uint8_t Speed);
 void DrivingAPIs_Break(void);
@@ -24,6 +25,7 @@ typedef struct
 	uint8_t TurnLeft;
 
 }MoveDir_t;
+*/
 
 
 

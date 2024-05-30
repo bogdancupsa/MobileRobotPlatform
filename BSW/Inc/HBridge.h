@@ -8,6 +8,7 @@
 #ifndef INC_HBRIDGE_H_
 #define INC_HBRIDGE_H_
 
+/*
 
 void HBridge_MotorControl(Wheels_t Wheel, RotateDir_t Direction, uint8_t Speed);
 void HBridge_PinConfig(void);
@@ -30,6 +31,7 @@ typedef struct
 
 }RotateDir_t;
 
+*/
 
 
 

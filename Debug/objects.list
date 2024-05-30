@@ -1,7 +1,6 @@
 "./ASW/Src/DrivingAPIs.o"
 "./ASW/Src/MotionController.o"
 "./ASW/Src/SensorMapping.o"
-"./ASW/Src/test_app.o"
 "./BSW/Src/HBridge.o"
 "./BSW/Src/HCSR04.o"
 "./BSW/Src/ServoSG90.o"

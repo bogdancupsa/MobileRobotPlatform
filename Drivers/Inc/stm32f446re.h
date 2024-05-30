@@ -73,6 +73,15 @@
 #define TIM14_BASEADDR						0x40002000U
 #define RTC_BASEADDR						0x40002800U
 
+#define PWR_BASE              				(APB1PERIPH_BASE + 0x7000UL)
+
+
+/********************  Bit definition for RCC_APB1ENR register  ***************/
+#define RCC_APB1ENR_PWREN_Pos              (28U)
+#define RCC_APB1ENR_PWREN_Msk              (0x1UL << RCC_APB1ENR_PWREN_Pos)     /*!< 0x10000000 */
+#define RCC_APB1ENR_PWREN                  RCC_APB1ENR_PWREN_Msk
+
+
 /*************************************************************************************************************************************************/
 /*
  * Base addresses of peripherals which are hanging on APB2 bus
@@ -106,6 +115,85 @@
 
 #define RCC_BASEADDR						0x40023800U
 
+
+#define FLASH_R_BASE          				(AHB1PERIPH_BASE + 0x3C00UL)
+
+
+/******************************************************************************/
+/*                                                                            */
+/*                             Power Control                                  */
+/*                                                                            */
+/******************************************************************************/
+/*!< PVD level configuration */
+#define PWR_CR_VOS_Pos         (14U)
+#define PWR_CR_VOS_Msk         (0x3UL << PWR_CR_VOS_Pos)                        /*!< 0x0000C000 */
+#define PWR_CR_VOS             PWR_CR_VOS_Msk                                  /*!< VOS[1:0] bits (Regulator voltage scaling output selection) */
+
+
+
+/******************************************************************************/
+/*                                                                            */
+/*                                    FLASH                                   */
+/*                                                                            */
+/******************************************************************************/
+/*******************  Bits definition for FLASH_ACR register  *****************/
+#define FLASH_ACR_ICEN_Pos             (9U)
+#define FLASH_ACR_ICEN_Msk             (0x1UL << FLASH_ACR_ICEN_Pos)            /*!< 0x00000200 */
+#define FLASH_ACR_ICEN                 FLASH_ACR_ICEN_Msk
+#define FLASH_ACR_DCEN_Pos             (10U)
+#define FLASH_ACR_DCEN_Msk             (0x1UL << FLASH_ACR_DCEN_Pos)            /*!< 0x00000400 */
+#define FLASH_ACR_DCEN                 FLASH_ACR_DCEN_Msk
+#define FLASH_ACR_PRFTEN_Pos           (8U)
+#define FLASH_ACR_PRFTEN_Msk           (0x1UL << FLASH_ACR_PRFTEN_Pos)          /*!< 0x00000100 */
+#define FLASH_ACR_PRFTEN               FLASH_ACR_PRFTEN_Msk
+#define FLASH_ACR_LATENCY_5WS          0x00000005U
+
+/******************************************************************************/
+/*                                                                            */
+/*                         Reset and Clock Control                            */
+/*                                                                            */
+/******************************************************************************/
+/********************  Bit definition for RCC_CR register  ********************/
+#define RCC_CR_HSEON_Pos                   (16U)
+#define RCC_CR_HSEON_Msk                   (0x1UL << RCC_CR_HSEON_Pos)          /*!< 0x00010000 */
+#define RCC_CR_HSEON                       RCC_CR_HSEON_Msk
+
+#define RCC_CR_HSERDY_Pos                  (17U)
+#define RCC_CR_HSERDY_Msk                  (0x1UL << RCC_CR_HSERDY_Pos)         /*!< 0x00020000 */
+#define RCC_CR_HSERDY                      RCC_CR_HSERDY_Msk
+
+#define RCC_CR_PLLON_Pos                   (24U)
+#define RCC_CR_PLLON_Msk                   (0x1UL << RCC_CR_PLLON_Pos)          /*!< 0x01000000 */
+#define RCC_CR_PLLON                       RCC_CR_PLLON_Msk
+
+#define RCC_CR_PLLRDY_Pos                  (25U)
+#define RCC_CR_PLLRDY_Msk                  (0x1UL << RCC_CR_PLLRDY_Pos)         /*!< 0x02000000 */
+#define RCC_CR_PLLRDY                      RCC_CR_PLLRDY_Msk
+
+/********************  Bit definition for RCC_CFGR register  ******************/
+#define RCC_CFGR_HPRE_DIV1                 0x00000000U                         /*!< SYSCLK not divided    */
+#define RCC_CFGR_PPRE1_DIV4                0x00001400U                         /*!< HCLK divided by 4  */
+#define RCC_CFGR_PPRE2_DIV2                0x00008000U                         /*!< HCLK divided by 2  */
+#define RCC_CFGR_SW_PLL                    0x00000002U                         /*!< PLL selected as system clock */
+
+/*!< SWS configuration */
+#define RCC_CFGR_SWS_Pos                   (2U)
+#define RCC_CFGR_SWS_Msk                   (0x3UL << RCC_CFGR_SWS_Pos)          /*!< 0x0000000C */
+#define RCC_CFGR_SWS                       RCC_CFGR_SWS_Msk                    /*!< SWS[1:0] bits (System Clock Switch Status) */
+
+#define RCC_CFGR_SWS_PLL                   0x00000008U                         /*!< PLL used as system clock                   */
+
+/********************  Bit definition for RCC_PLLCFGR register  ***************/
+#define RCC_PLLCFGR_PLLSRC_HSE_Pos         (22U)
+#define RCC_PLLCFGR_PLLSRC_HSE_Msk         (0x1UL << RCC_PLLCFGR_PLLSRC_HSE_Pos) /*!< 0x00400000 */
+#define RCC_PLLCFGR_PLLSRC_HSE             RCC_PLLCFGR_PLLSRC_HSE_Msk
+
+#define TIM1_BASE             			   (APB2PERIPH_BASE + 0x0000UL)
+#define TIM1                			   ((TIM_RegDef_t*) TIM1_BASE)
+#define TIM6_BASE             			   (APB1PERIPH_BASE + 0x1000UL)
+#define TIM6                			   ((TIM_RegDef_t*) TIM6_BASE)
+
+
 /**************************************************************************************************************************************************
  *  	   	   	   	   	   	   	   	   	   	   	   	   	   Peripheral register definition structures
  *************************************************************************************************************************************************/
@@ -126,6 +214,68 @@ typedef struct
   __vo uint32_t AFR[2]; 					/*!<GPIO alternate function low register (AFRL): AFR[0], 		            	Address offset: 0x20 */
 											/*!<GPIO alternate function high register (AFRH): AFR[1],		 	    		Address offset: 0x24 */
 } GPIO_RegDef_t;
+
+
+/**
+  * @brief Power Control
+  */
+
+typedef struct
+{
+  __vo uint32_t CR;   /*!< PWR power control register,        Address offset: 0x00 */
+  __vo uint32_t CSR;  /*!< PWR power control/status register, Address offset: 0x04 */
+} PWR_RegDef_t;
+
+
+/**
+  * @brief FLASH Registers
+  */
+typedef struct
+{
+  __vo uint32_t ACR;      /*!< FLASH access control register,   Address offset: 0x00 */
+  __vo uint32_t KEYR;     /*!< FLASH key register,              Address offset: 0x04 */
+  __vo uint32_t OPTKEYR;  /*!< FLASH option key register,       Address offset: 0x08 */
+  __vo uint32_t SR;       /*!< FLASH status register,           Address offset: 0x0C */
+  __vo uint32_t CR;       /*!< FLASH control register,          Address offset: 0x10 */
+  __vo uint32_t OPTCR;    /*!< FLASH option control register ,  Address offset: 0x14 */
+  __vo uint32_t OPTCR1;   /*!< FLASH option control register 1, Address offset: 0x18 */
+} FLASH_RegDef_t;
+
+
+
+/**
+  * @brief TIM
+  */
+
+typedef struct
+{
+  __vo uint32_t CR1;         /*!< TIM control register 1,              Address offset: 0x00 */
+  __vo uint32_t CR2;         /*!< TIM control register 2,              Address offset: 0x04 */
+  __vo uint32_t SMCR;        /*!< TIM slave mode control register,     Address offset: 0x08 */
+  __vo uint32_t DIER;        /*!< TIM DMA/interrupt enable register,   Address offset: 0x0C */
+  __vo uint32_t SR;          /*!< TIM status register,                 Address offset: 0x10 */
+  __vo uint32_t EGR;         /*!< TIM event generation register,       Address offset: 0x14 */
+  __vo uint32_t CCMR1;       /*!< TIM capture/compare mode register 1, Address offset: 0x18 */
+  __vo uint32_t CCMR2;       /*!< TIM capture/compare mode register 2, Address offset: 0x1C */
+  __vo uint32_t CCER;        /*!< TIM capture/compare enable register, Address offset: 0x20 */
+  __vo uint32_t CNT;         /*!< TIM counter register,                Address offset: 0x24 */
+  __vo uint32_t PSC;         /*!< TIM prescaler,                       Address offset: 0x28 */
+  __vo uint32_t ARR;         /*!< TIM auto-reload register,            Address offset: 0x2C */
+  __vo uint32_t RCR;         /*!< TIM repetition counter register,     Address offset: 0x30 */
+  __vo uint32_t CCR1;        /*!< TIM capture/compare register 1,      Address offset: 0x34 */
+  __vo uint32_t CCR2;        /*!< TIM capture/compare register 2,      Address offset: 0x38 */
+  __vo uint32_t CCR3;        /*!< TIM capture/compare register 3,      Address offset: 0x3C */
+  __vo uint32_t CCR4;        /*!< TIM capture/compare register 4,      Address offset: 0x40 */
+  __vo uint32_t BDTR;        /*!< TIM break and dead-time register,    Address offset: 0x44 */
+  __vo uint32_t DCR;         /*!< TIM DMA control register,            Address offset: 0x48 */
+  __vo uint32_t DMAR;        /*!< TIM DMA address for full transfer,   Address offset: 0x4C */
+  __vo uint32_t OR;          /*!< TIM option register,                 Address offset: 0x50 */
+} TIM_RegDef_t;
+
+
+
+
+
 /*
  * This section gives a detailed description of the RCC registers.
  */
@@ -214,6 +364,8 @@ typedef struct
 #define EXTI								((EXTI_RegDef_t*)EXTI_BASEADDR)
 #define SYSCFG								((SYSCFG_RegDef_t*)SYSCFG_BASEADDR)
 
+#define PWR                					((PWR_RegDef_t*) PWR_BASE)
+#define FLASH               				((FLASH_RegDef_t*) FLASH_R_BASE)
 /**************************************************************************************************************************************************
  *															    Clock Enable Macros
  *************************************************************************************************************************************************/

@@ -1,3 +1,0 @@
-../ASW/Src/test_app.c:17:6:test_GPIO_config	1
-../ASW/Src/test_app.c:42:6:test_GPIO_blink	2
-../ASW/Src/test_app.c:51:6:sw_delay	2
