@@ -21,7 +21,7 @@ static Speeds_t Speeds = {0};
 void DrivingAPIs_LineMove(uint16_t Speed, uint8_t Direction)
 {
 
-
+	ServoSG90_SteeringWheelCtrl(TURN_BACK);
 	Wheels.BackLeftWheel = ENABLE;
 	Wheels.BackRightWheel = ENABLE;
 
@@ -52,7 +52,19 @@ void DrivingAPIs_LineMove(uint16_t Speed, uint8_t Direction)
 
 void DrivingAPIs_TurnMove(uint16_t Dir, uint8_t Angle, uint16_t Speed)
 {
-	ServoSG90_SteeringWheelCtrl(Dir);
+
+
+	static uint8_t flag;
+	static uint8_t flag2;
+	static uint8_t last_Dir;
+
+
+	if( (Dir != last_Dir)&&(flag2==10))
+	{
+		ServoSG90_SteeringWheelCtrl(Dir);
+		last_Dir = Dir;
+	}
+
 
 	Wheels.BackLeftWheel = ENABLE;
 	Wheels.BackRightWheel = ENABLE;
@@ -64,14 +76,14 @@ void DrivingAPIs_TurnMove(uint16_t Dir, uint8_t Angle, uint16_t Speed)
 
 	if(Dir == TURN_LEFT)
 	{
-		Speeds.Speeds.BackLeftWheel = Speed/3; // speed/2
+		Speeds.Speeds.BackLeftWheel = HALF(Speed); // speed/2
 		Speeds.Speeds.BackRightWheel = Speed;
 
 	}
 	else if(Dir == TURN_RIGHT)
 	{
 		Speeds.Speeds.BackLeftWheel = Speed;
-		Speeds.Speeds.BackRightWheel = Speed/3; // speed/2
+		Speeds.Speeds.BackRightWheel = HALF(Speed);; // speed/2
 	}
 	/*else
 	{
@@ -82,11 +94,22 @@ void DrivingAPIs_TurnMove(uint16_t Dir, uint8_t Angle, uint16_t Speed)
 
 
 		HBridge_MotorControl(&Wheels, &Directions, &Speeds);
-		HAL_Delay(1000);
+
+		if ((flag == CALC_ANGLE)&& (last_Dir = Dir))
+		{
+
 		ServoSG90_SteeringWheelCtrl(TURN_BACK);
-		Wheels.BackLeftWheel = DISABLE;
-		Wheels.BackRightWheel = DISABLE;
-		HBridge_MotorStop(&Wheels);
+		flag=0;
+		flag2 = 10;
+		}
+		else
+		{
+			flag++;
+			flag2= 20;
+		}
+		//Wheels.BackLeftWheel = DISABLE;
+		//Wheels.BackRightWheel = DISABLE;
+		//HBridge_MotorStop(&Wheels);
 
 }
 

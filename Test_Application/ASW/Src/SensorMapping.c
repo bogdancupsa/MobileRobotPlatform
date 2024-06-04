@@ -11,9 +11,9 @@
 #include "main.h"
 #include "HCSR04.h"
 
+#define TRIG_READ 20
 
-
-extern uint8_t Distance;
+extern uint16_t Distance;
 
 
 
@@ -24,7 +24,6 @@ void SensorMapping_Read(SensorsPosition_t *SensorMapping)
 	static uint8_t flag;
 
 	HCSR04_Read();
-	HAL_Delay(200);
 
 	if(Distance <50)
 	{

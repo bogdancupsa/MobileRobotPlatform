@@ -19,7 +19,9 @@
 #define TURN_RIGHT	1
 #define TURN_LEFT	2
 */
+#define HALF(Speed)		(Speed/2)
 
+#define CALC_ANGLE 	5
 
 #define ENABLE 		1
 #define DISABLE		0

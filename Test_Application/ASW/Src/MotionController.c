@@ -21,11 +21,12 @@ void state_machine(void)
 
 		//static uint8_t State;
 
-		DrivingAPIs_Break(BREAK);
-		HAL_Delay(1000);
+		//DrivingAPIs_Break(BREAK);
+
+
 		SensorMapping_Read(&ActSensPos);
 
-	//	lu8_ActSensPos = Encoding(ActSensPos);
+		//lu8_ActSensPos = Encoding(ActSensPos);
 
 
 	//	if(lu8_LastSensPos != lu8_ActSensPos)
@@ -62,24 +63,43 @@ void state_machine(void)
 		//DrivingAPIs_TurnMove(TURN_LEFT, 0, SPEED_30);
 		//HAL_Delay(1000);
 
+static uint8_t flag;
+
+
+
 if(ActSensPos.FronLeft.Detection)
 {
-	DrivingAPIs_Break(BREAK);
-	DrivingAPIs_TurnMove(TURN_RIGHT, 0, SPEED_30);
-}
-else if(ActSensPos.FrontRight.Detection==1)
-{
-	DrivingAPIs_Break(BREAK);
-	DrivingAPIs_TurnMove(TURN_LEFT, 0, SPEED_30);
+
+
+	if (flag <= 25)
+	{
+		DrivingAPIs_TurnMove(TURN_RIGHT, 0, SPEED_80);
+		flag++;
+	}
+	else if (flag <= 50)
+	{
+		DrivingAPIs_TurnMove(TURN_LEFT, 0, SPEED_80);
+		flag++;
+	}
+
+
+
+	//DrivingAPIs_LineMove(SPEED_50,FORWARD);
+	//DrivingAPIs_TurnMove(TURN_LEFT, 0, SPEED_30);
+	//DrivingAPIs_LineMove(SPEED_50,FORWARD);
 }
 else
 {
 	DrivingAPIs_LineMove(SPEED_50,FORWARD);
+	flag++;
 
 }
 
 
-
+if (flag >= 51)
+	{
+		flag =0;
+	}
 
 		//	lu8_LastSensPos=lu8_ActSensPos;
 
