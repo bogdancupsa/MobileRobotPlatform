@@ -542,7 +542,7 @@ void StartDefaultTask(void *argument)
   for(;;)
   {
 	state_machine();
-    osDelay(200);
+    osDelay(25);
   }
   /* USER CODE END 5 */
 }

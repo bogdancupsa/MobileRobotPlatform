@@ -58,8 +58,12 @@ void DrivingAPIs_TurnMove(uint16_t Dir, uint8_t Angle, uint16_t Speed)
 	static uint8_t flag2;
 	static uint8_t last_Dir;
 
-
-	if( (Dir != last_Dir)&&(flag2==10))
+	/*if(Dir != last_Dir)
+			{
+				flag2=0;
+			}
+*/
+	if( (Dir != last_Dir)/*&&(flag2<10)*/)
 	{
 		ServoSG90_SteeringWheelCtrl(Dir);
 		last_Dir = Dir;
@@ -95,18 +99,19 @@ void DrivingAPIs_TurnMove(uint16_t Dir, uint8_t Angle, uint16_t Speed)
 
 		HBridge_MotorControl(&Wheels, &Directions, &Speeds);
 
-		if ((flag == CALC_ANGLE)&& (last_Dir = Dir))
+	/*	if ((flag == 40)&&(last_Dir = Dir))
 		{
 
 		ServoSG90_SteeringWheelCtrl(TURN_BACK);
 		flag=0;
-		flag2 = 10;
+		flag2 = 0;
+
 		}
 		else
 		{
 			flag++;
 			flag2= 20;
-		}
+		}*/
 		//Wheels.BackLeftWheel = DISABLE;
 		//Wheels.BackRightWheel = DISABLE;
 		//HBridge_MotorStop(&Wheels);

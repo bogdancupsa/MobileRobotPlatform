@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2024-05-29T08:45:52.390Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="qg7EiyviYR0g1VfUR66Y" version="24.3.1" type="device" pages="2">
+<mxfile host="app.diagrams.net" modified="2024-06-04T12:41:48.347Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="aHE2TVBl0UAc-Vj0TyFs" version="24.4.10" type="device" pages="3">
   <diagram name="Layers" id="9f46799a-70d6-7492-0946-bef42562c5a5">
     <mxGraphModel dx="1434" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
@@ -223,6 +223,80 @@
         </mxCell>
         <mxCell id="M5rpABA7w1dHyp91L7e_-1" value="period, frequency, duty cycle" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=-90;" parent="1" vertex="1">
           <mxGeometry x="189" y="661" width="300" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="H8i2yRGWHmaviaE664-i" name="System ">
+    <mxGraphModel dx="1434" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="40" width="440" height="560" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-2" value="SG90&amp;nbsp;&lt;div&gt;Servo&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ba1e2;strokeColor=#006EAF;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="350" y="470" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-3" value="HCSR04&amp;nbsp;&lt;div&gt;Sensor&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b0e3e6;strokeColor=#0e8088;" vertex="1" parent="1">
+          <mxGeometry x="350" y="540" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="gvdAtMeaizBIVgEbx-9z-5" target="gvdAtMeaizBIVgEbx-9z-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="gvdAtMeaizBIVgEbx-9z-5" target="gvdAtMeaizBIVgEbx-9z-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-5" value="&amp;nbsp;L298N&amp;nbsp;&lt;div&gt;H Bridge&lt;br&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="240" y="180" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="gvdAtMeaizBIVgEbx-9z-6" target="gvdAtMeaizBIVgEbx-9z-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="gvdAtMeaizBIVgEbx-9z-6" target="gvdAtMeaizBIVgEbx-9z-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-6" value="STM32 Nucleo F446RE" style="whiteSpace=wrap;html=1;aspect=fixed;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="400" y="230" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-7" value="DC Gearbox&amp;nbsp;&lt;div&gt;Motor&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="210" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-8" value="DC Gearbox&amp;nbsp;&lt;div&gt;Motor&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="510" y="80" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="gvdAtMeaizBIVgEbx-9z-9" target="gvdAtMeaizBIVgEbx-9z-5">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="220" y="395" />
+              <mxPoint x="220" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="gvdAtMeaizBIVgEbx-9z-9" target="gvdAtMeaizBIVgEbx-9z-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-9" value="2 x 3.7 V Battery" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="240" y="340" width="90" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-13" value="PWM" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="310" y="284" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-14" value="PWM" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="420" y="407" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-19" value="Signal" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="540" y="440" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gvdAtMeaizBIVgEbx-9z-20" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=1.006;entryY=0.556;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="gvdAtMeaizBIVgEbx-9z-6">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="570" as="sourcePoint" />
+            <mxPoint x="520" y="520" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="590" y="570" />
+              <mxPoint x="590" y="319" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

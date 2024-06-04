@@ -9,6 +9,7 @@
 #include "MotionController.h"
 
 
+
 uint8_t Encoding(SensorsPosition_t data);
 
 void state_machine(void)
@@ -64,49 +65,82 @@ void state_machine(void)
 		//HAL_Delay(1000);
 
 static uint8_t flag;
-
-
+static uint8_t flag2;
+static uint8_t flag3;
 
 if(ActSensPos.FronLeft.Detection)
 {
 
-
-	if (flag <= 25)
+	if(ActSensPos.FronLeft.ActualDistance <10)
 	{
-		DrivingAPIs_TurnMove(TURN_RIGHT, 0, SPEED_80);
-		flag++;
-	}
-	else if (flag <= 50)
-	{
-		DrivingAPIs_TurnMove(TURN_LEFT, 0, SPEED_80);
-		flag++;
+		flag3=1;
 	}
 
+	if(flag3==1)
+	{
+		if(flag2 < 20)
+		{
+		DrivingAPIs_Break(BREAK);
+		flag2++;
+		}
+		else if(flag2 >= 20)
+		{
+
+			//if(flag==20)
+			//{
+				//DrivingAPIs_TurnMove(TURN_RIGHT, 0, SPEED_0);
+			//}
+			/*else if(flag == 40)
+			{
+				DrivingAPIs_TurnMove(TURN_BACK, 0, SPEED_0);
+			}*/
+		DrivingAPIs_LineMove(SPEED_50,BACKWARD);
+		//DrivingAPIs_TurnMove(TURN_RIGHT, 0, SPEED_0);
+
+		flag2++;
+
+		if(flag2 == 160)
+		{
+			flag2 =0;
+
+		}
+
+		}
+		flag3 =0;
+	}
+	else if (flag <= 150)
+	{
+
+		DrivingAPIs_TurnMove(TURN_RIGHT, 0, SPEED_20);
+		flag++;
+
+	}
+	else if (flag <= 300)
+	{
+
+		DrivingAPIs_TurnMove(TURN_LEFT, 0, SPEED_20);
+		flag++;
+	}
 
 
-	//DrivingAPIs_LineMove(SPEED_50,FORWARD);
-	//DrivingAPIs_TurnMove(TURN_LEFT, 0, SPEED_30);
-	//DrivingAPIs_LineMove(SPEED_50,FORWARD);
 }
 else
 {
-	DrivingAPIs_LineMove(SPEED_50,FORWARD);
+	DrivingAPIs_LineMove(SPEED_20,FORWARD);
 	flag++;
 
 }
 
 
-if (flag >= 51)
+if (flag >= 301)
 	{
 		flag =0;
 	}
 
-		//	lu8_LastSensPos=lu8_ActSensPos;
 
-			//DrivingAPIs_LineMove(SPEED_100,FORWARD);
-		//	lu8_LastSensPos=lu8_ActSensPos;
 
 }
+
 
 uint8_t Encoding(SensorsPosition_t data)
 {
