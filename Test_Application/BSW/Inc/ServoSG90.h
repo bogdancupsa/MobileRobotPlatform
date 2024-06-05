@@ -15,7 +15,7 @@ void ServoSG90_SteeringWheelCtrl(uint16_t Direction);
 
 #define	TURN_LEFT				2000 // 2 ms
 #define TURN_RIGHT				1000 // 1 ms
-#define TURN_BACK				1500 // 1.5 ms -initial position
+#define TURN_BACK				1550 // 1550 1.5 ms -initial position
 #define TURN_LEFT_REVERSE		3
 #define TURN_RIGHT_REVERSE		4
 

@@ -11,7 +11,9 @@
 #include "HCSR04.h"
 #include <stdint.h>
 
-
+#define DETECTION_10cm 		10
+#define DETECTION_30cm 		30
+#define DETECTION_60cm 		60
 
 
 

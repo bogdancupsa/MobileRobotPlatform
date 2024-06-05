@@ -11,11 +11,10 @@
 #include "DrivingAPIs.h"
 #include "SensorMapping.h"
 
+#define TASK_DELAY	150
 
-#define CC    00// clear everywhere
-#define BB	11// blocked everywhere
-#define CB	01// left clear
-#define BC	10//	right clear
+
+
 
 void state_machine(void);
 /*void read_map(void);

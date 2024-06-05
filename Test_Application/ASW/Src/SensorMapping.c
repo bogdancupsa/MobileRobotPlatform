@@ -25,7 +25,7 @@ void SensorMapping_Read(SensorsPosition_t *SensorMapping)
 
 	HCSR04_Read();
 
-	if(Distance <50)
+	if(Distance <DETECTION_60cm)
 	{
 	SensorMapping->FronLeft.Detection= 1;
 	SensorMapping->FronLeft.ActualDistance = Distance;

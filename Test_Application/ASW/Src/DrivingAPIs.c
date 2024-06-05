@@ -54,8 +54,8 @@ void DrivingAPIs_TurnMove(uint16_t Dir, uint8_t Angle, uint16_t Speed)
 {
 
 
-	static uint8_t flag;
-	static uint8_t flag2;
+	/*static uint8_t flag;
+	static uint8_t flag2;*/
 	static uint8_t last_Dir;
 
 	/*if(Dir != last_Dir)
@@ -96,8 +96,11 @@ void DrivingAPIs_TurnMove(uint16_t Dir, uint8_t Angle, uint16_t Speed)
 	}*/
 
 
+		if(Speed != 0)
+		{
+			HBridge_MotorControl(&Wheels, &Directions, &Speeds);
+		}
 
-		HBridge_MotorControl(&Wheels, &Directions, &Speeds);
 
 	/*	if ((flag == 40)&&(last_Dir = Dir))
 		{

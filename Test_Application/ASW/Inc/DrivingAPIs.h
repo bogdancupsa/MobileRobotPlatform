@@ -41,6 +41,7 @@
 #define SPEED_50 		32768
 
 #define SPEED_40 		26214
+#define SPEED_35 		22937
 #define SPEED_30 		19661
 #define SPEED_20 		13107
 #define SPEED_10 		6554
