@@ -1,10 +1,10 @@
-<mxfile host="app.diagrams.net" modified="2024-06-05T07:15:56.391Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="-zNzkuSOTxchyeA4XV1l" version="24.4.13" type="device" pages="3">
+<mxfile host="app.diagrams.net" modified="2024-06-05T13:50:41.753Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36" etag="Miqf7RJ1lsc6T1RGno8r" version="24.4.13" type="device" pages="3">
   <diagram name="Layers" id="9f46799a-70d6-7492-0946-bef42562c5a5">
-    <mxGraphModel dx="1434" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="866" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="WN5MQBMDulGKWuoHuriL-1" value="&lt;b&gt;&amp;nbsp;µ&lt;br&gt;Microcontroller&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="WN5MQBMDulGKWuoHuriL-1" value="&lt;b&gt;&amp;nbsp;µ&lt;br&gt;Microcontroller STM F446RE&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry y="790" width="1100" height="60" as="geometry" />
         </mxCell>
         <mxCell id="WN5MQBMDulGKWuoHuriL-4" value="&lt;b&gt;BSW&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;b&gt;Basic Software&lt;/b&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;" parent="1" vertex="1">
@@ -48,16 +48,19 @@
         <mxCell id="wkVM5qidmTQ8ACAwtAOG-1" value="&lt;b&gt;Servo SG90&lt;/b&gt;&lt;div&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;- servo motor driver configuration&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" parent="1" vertex="1">
           <mxGeometry x="240" y="440" width="180" height="150" as="geometry" />
         </mxCell>
+        <mxCell id="mB2uV90OdampBJ-iTViw-1" value="&lt;b&gt;OS&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="190" width="270" height="580" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="C_FHzEb-dXRl69qqiuh0" name="Interactions">
-    <mxGraphModel dx="1434" dy="1846" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2049" dy="2166" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="bQyWpGzspWKE9kRidEea-1" value="&lt;b&gt;&amp;nbsp;µ&lt;br&gt;Microcontroller&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="10" y="1020" width="820" height="60" as="geometry" />
+        <mxCell id="bQyWpGzspWKE9kRidEea-1" value="&lt;b&gt;&amp;nbsp;µ&lt;br&gt;Microcontroller STM F446RE&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="10" y="1020" width="1020" height="60" as="geometry" />
         </mxCell>
         <mxCell id="bQyWpGzspWKE9kRidEea-5" value="&lt;b&gt;GPIO &lt;br&gt;Driver&lt;/b&gt;&lt;div&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;div&gt;- configuration structures for pins&lt;/div&gt;&lt;div&gt;- driver APIs&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="430" y="740" width="170" height="120" as="geometry" />
@@ -170,12 +173,6 @@
         <mxCell id="bQyWpGzspWKE9kRidEea-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="bQyWpGzspWKE9kRidEea-7" target="bQyWpGzspWKE9kRidEea-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="bQyWpGzspWKE9kRidEea-47" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.616;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="bQyWpGzspWKE9kRidEea-1" target="bQyWpGzspWKE9kRidEea-7" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="490" y="970" as="sourcePoint" />
-            <mxPoint x="540" y="920" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="bQyWpGzspWKE9kRidEea-51" value="" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="bQyWpGzspWKE9kRidEea-8" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="550" y="600" as="sourcePoint" />
@@ -224,11 +221,20 @@
         <mxCell id="M5rpABA7w1dHyp91L7e_-1" value="period, frequency, duty cycle" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=-90;" parent="1" vertex="1">
           <mxGeometry x="189" y="661" width="300" height="30" as="geometry" />
         </mxCell>
+        <mxCell id="nwzIpaAs6yD1lBKTuvlG-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="nwzIpaAs6yD1lBKTuvlG-1" target="bQyWpGzspWKE9kRidEea-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="nwzIpaAs6yD1lBKTuvlG-1" value="OS" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=middle;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="860" y="90" width="170" height="910" as="geometry" />
+        </mxCell>
+        <mxCell id="nwzIpaAs6yD1lBKTuvlG-3" value="Cyclic Call 25ms" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="710" y="330" width="160" height="30" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="H8i2yRGWHmaviaE664-i" name="System ">
-    <mxGraphModel dx="1434" dy="746" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="866" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
