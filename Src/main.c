@@ -32,6 +32,9 @@
 #include "Interface/Include/uart_interface.h"
 #include "Interface/Include/motor_control_interface.h"
 #include "OS/Include/os_tasks.h"
+#include "task.h"
+#include "FreeRTOS.h"
+#include "CAN_SPI.h"
 
 /* USER CODE END Includes */
 
@@ -51,10 +54,13 @@
 /* USER CODE BEGIN PM */
 
 #define UART_BUFFER_SIZE 200
+#define STACK_SIZE 128
 
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+SPI_HandleTypeDef hspi3;
+
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
@@ -63,10 +69,20 @@ TIM_HandleTypeDef htim8;
 UART_HandleTypeDef huart2;
 
 osThreadId defaultTaskHandle;
-osThreadId UartHandle;
-osThreadId MotorControlHandle;
-osThreadId FrontUltrasonicHandle;
+osThreadId MotorControlTasHandle;
+uint32_t MotorControlTasBuffer[ 128 ];
+osStaticThreadDef_t MotorControlTasControlBlock;
+osThreadId SensorHandle;
+uint32_t SensorBuffer[ 128 ];
+osStaticThreadDef_t SensorControlBlock;
+osThreadId UARTHandle;
+uint32_t UARTBuffer[ 128 ];
+osStaticThreadDef_t UARTControlBlock;
+
 /* USER CODE BEGIN PV */
+
+uCAN_MSG txMessage;
+uCAN_MSG rxMessage;
 
 /* USER CODE END PV */
 
@@ -78,10 +94,11 @@ static void MX_TIM4_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM8_Init(void);
+static void MX_SPI3_Init(void);
 void StartDefaultTask(void const * argument);
-void UartTask(void const * argument);
 void MotorControlTask(void const * argument);
 void FrontUltrasonicSensorTask(void const * argument);
+void UartTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -94,7 +111,7 @@ void usDelay(uint32_t us);
 
 SemaphoreHandle_t mutex_frontSensor;
 
-const float speed_of_sound = 0.0343 / 2;
+const float speed_of_sound = 0.0343 / 2;  /* speed of sound in cm per us */
 int distanceFrontSensor;
 
 uint8_t  icFlag                 = 0;
@@ -110,6 +127,10 @@ uint8_t  direction_left_rear    = FORWARD;
 uint8_t  direction_right_rear   = FORWARD;
 
 char     uartBuf[UART_BUFFER_SIZE];
+
+int uartTaskCounter;
+int motorTaskCounter;
+int sensorTaskCounter;
 
 /* USER CODE END 0 */
 
@@ -146,6 +167,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM2_Init();
   MX_TIM8_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
 
 //  distanceRightSensor = (int*)malloc(sizeof(int));
@@ -153,9 +175,24 @@ int main(void)
 //  {
 //	  Error_Handler();
 //  }
+  uartTaskCounter = 0;
+  motorTaskCounter = 0;
+  sensorTaskCounter = 0;
+
   distanceFrontSensor = 0;
 
   mutex_frontSensor = xSemaphoreCreateMutex();
+
+  int ret;
+  ret = CANSPI_Initialize();
+
+  if (ret < 0)
+  { /* error => stall the processor */
+	  while(1)
+	  {
+
+	  }
+  }
 
   /* USER CODE END 2 */
 
@@ -180,17 +217,17 @@ int main(void)
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
-  /* definition and creation of Uart */
-  osThreadDef(Uart, UartTask, osPriorityNormal, 0, 128);
-  UartHandle = osThreadCreate(osThread(Uart), NULL);
+  /* definition and creation of MotorControlTas */
+  osThreadStaticDef(MotorControlTas, MotorControlTask, osPriorityNormal, 0, 128, MotorControlTasBuffer, &MotorControlTasControlBlock);
+  MotorControlTasHandle = osThreadCreate(osThread(MotorControlTas), NULL);
 
-  /* definition and creation of MotorControl */
-  osThreadDef(MotorControl, MotorControlTask, osPriorityNormal, 0, 128);
-  MotorControlHandle = osThreadCreate(osThread(MotorControl), NULL);
+  /* definition and creation of Sensor */
+  osThreadStaticDef(Sensor, FrontUltrasonicSensorTask, osPriorityNormal, 0, 128, SensorBuffer, &SensorControlBlock);
+  SensorHandle = osThreadCreate(osThread(Sensor), NULL);
 
-  /* definition and creation of FrontUltrasonic */
-  osThreadDef(FrontUltrasonic, FrontUltrasonicSensorTask, osPriorityNormal, 0, 128);
-  FrontUltrasonicHandle = osThreadCreate(osThread(FrontUltrasonic), NULL);
+  /* definition and creation of UART */
+  osThreadStaticDef(UART, UartTask, osPriorityNormal, 0, 128, UARTBuffer, &UARTControlBlock);
+  UARTHandle = osThreadCreate(osThread(UART), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -203,8 +240,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-//    HAL_Delay(5000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -260,6 +295,46 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief SPI3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_SPI3_Init(void)
+{
+
+  /* USER CODE BEGIN SPI3_Init 0 */
+
+  /* USER CODE END SPI3_Init 0 */
+
+  /* USER CODE BEGIN SPI3_Init 1 */
+
+  /* USER CODE END SPI3_Init 1 */
+  /* SPI3 parameter configuration*/
+  hspi3.Instance = SPI3;
+  hspi3.Init.Mode = SPI_MODE_MASTER;
+  hspi3.Init.Direction = SPI_DIRECTION_2LINES;
+  hspi3.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi3.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi3.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi3.Init.NSS = SPI_NSS_SOFT;
+  hspi3.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi3.Init.FirstBit = SPI_FIRSTBIT_MSB;
+  hspi3.Init.TIMode = SPI_TIMODE_DISABLE;
+  hspi3.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
+  hspi3.Init.CRCPolynomial = 7;
+  hspi3.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+  hspi3.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+  if (HAL_SPI_Init(&hspi3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN SPI3_Init 2 */
+
+  /* USER CODE END SPI3_Init 2 */
+
 }
 
 /**
@@ -558,7 +633,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, IN4REAR_Pin|IN1REAR_Pin|IN2REAR_Pin|IN3REAR_Pin
-                          |IN4_Pin|IN3_Pin, GPIO_PIN_RESET);
+                          |IN4_Pin|IN3_Pin|SPI3_CS_CAN_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
@@ -577,9 +652,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : IN4REAR_Pin IN1REAR_Pin IN2REAR_Pin IN3REAR_Pin
-                           IN4_Pin IN3_Pin */
+                           IN4_Pin IN3_Pin SPI3_CS_CAN_Pin */
   GPIO_InitStruct.Pin = IN4REAR_Pin|IN1REAR_Pin|IN2REAR_Pin|IN3REAR_Pin
-                          |IN4_Pin|IN3_Pin;
+                          |IN4_Pin|IN3_Pin|SPI3_CS_CAN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -648,34 +723,28 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	  osDelay(1);
+	txMessage.frame.idType = rxMessage.frame.idType;
+	txMessage.frame.id = 0x0A;
+	txMessage.frame.dlc = 8;
+	txMessage.frame.data0 = 0;
+	txMessage.frame.data1 = 1;
+	txMessage.frame.data2 = 2;
+	txMessage.frame.data3 = 3;
+	txMessage.frame.data4 = 4;
+	txMessage.frame.data5 = 5;
+	txMessage.frame.data6 = 6;
+	txMessage.frame.data7 = 7;
+	CANSPI_Transmit(&txMessage);
+
+	HAL_Delay(100);
+	osDelay(1);
   }
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_UartTask */
-/**
-* @brief Function implementing the Uart thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_UartTask */
-void UartTask(void const * argument)
-{
-  /* USER CODE BEGIN UartTask */
-  /* Infinite loop */
-  for(;;)
-  {
-	HandleUartTask(&huart2, (uint8_t*)uartBuf, sizeof(uartBuf), 100);
-	HAL_Delay(50);
-    osDelay(10);
-  }
-  /* USER CODE END UartTask */
-}
-
 /* USER CODE BEGIN Header_MotorControlTask */
 /**
-* @brief Function implementing the MotorControl thread.
+* @brief Function implementing the MotorControlTas thread.
 * @param argument: Not used
 * @retval None
 */
@@ -683,90 +752,59 @@ void UartTask(void const * argument)
 void MotorControlTask(void const * argument)
 {
   /* USER CODE BEGIN MotorControlTask */
-  int value_for_front_distance_sensor = 0;
+
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS(10); /* 10 mseconds */
+
+  xLastWakeTime = xTaskGetTickCount();
+
   /* Infinite loop */
   for(;;)
   {
-	  /* DC motor */
-	  xSemaphoreTake(mutex_frontSensor, portMAX_DELAY);
+//	  int value_for_front_distance_sensor = 0;
+//
+//	  xSemaphoreTake(mutex_frontSensor, portMAX_DELAY);
+//
+//	  value_for_front_distance_sensor = distanceFrontSensor;
+//
+//	  xSemaphoreGive(mutex_frontSensor);
+//
+//	  if (value_for_front_distance_sensor > STOP_LIMIT)
+//	  {
+//		  turn_value = GO;
+//	  }
+//	  else if ((value_for_front_distance_sensor > 0) && (value_for_front_distance_sensor < STOP_LIMIT))
+//	  {
+//		  turn_value = TURN_RIGHT;
+//	  }
+//
+//	  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_left_front, &direction_right_front, &direction_left_rear, &direction_right_rear);
+//
+//	  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_right_front);
+//	  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_left_front);
+//	  set_direction(IN1REAR_GPIO_Port, IN1REAR_Pin, IN2REAR_GPIO_Port, IN2REAR_Pin, direction_left_rear);
+//	  set_direction(IN3REAR_GPIO_Port, IN3REAR_Pin, IN4REAR_GPIO_Port, IN4REAR_Pin, direction_right_rear);
+//
+//	  TIM2->CCR3 = right_motor_value;
+//	  TIM8->CCR3 = left_motor_value;
+//	  TIM2->CCR1 = left_motor_value;
+//	  TIM2->CCR2 = right_motor_value;
+//
+//	  pwm_start(&htim2, TIM_CHANNEL_3);
+//	  pwm_start(&htim8, TIM_CHANNEL_3);
+//	  pwm_start(&htim2, TIM_CHANNEL_1);
+//	  pwm_start(&htim2, TIM_CHANNEL_2);
 
-	  value_for_front_distance_sensor = distanceFrontSensor;
+	  motorTaskCounter++;
 
-	  xSemaphoreGive(mutex_frontSensor);
-
-	  if ( value_for_front_distance_sensor > STOP_LIMIT )
-	  {
-		  turn_value = GO;
-
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_left_front, &direction_right_front, &direction_left_rear, &direction_right_rear);
-
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_right_front);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_left_front);
-
-		  set_direction(IN1REAR_GPIO_Port, IN1REAR_Pin, IN2REAR_GPIO_Port, IN2REAR_Pin, direction_left_rear);
-		  set_direction(IN3REAR_GPIO_Port, IN3REAR_Pin, IN4REAR_GPIO_Port, IN4REAR_Pin, direction_right_rear);
-
-		  TIM2->CCR3 = right_motor_value;  /* ARR = 1999 AND DUTY CYCLE = CCR / (ARR + 1)  AND CCR*/
-		  TIM8->CCR3 = left_motor_value;
-
-		  TIM2->CCR1 = left_motor_value;
-		  TIM2->CCR2 = right_motor_value;
-	  }
-	  else if ( (value_for_front_distance_sensor > 0) && (value_for_front_distance_sensor < STOP_LIMIT) )
-	  {
-		  turn_value = TURN_RIGHT;
-
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_left_front, &direction_right_front, &direction_left_rear, &direction_right_rear);
-
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_right_front);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_left_front);
-
-		  set_direction(IN1REAR_GPIO_Port, IN1REAR_Pin, IN2REAR_GPIO_Port, IN2REAR_Pin, direction_left_rear);
-		  set_direction(IN3REAR_GPIO_Port, IN3REAR_Pin, IN4REAR_GPIO_Port, IN4REAR_Pin, direction_right_rear);
-
-		  TIM2->CCR3 = right_motor_value;
-		  TIM8->CCR3 = left_motor_value;
-
-		  TIM2->CCR1 = left_motor_value;
-		  TIM2->CCR2 = right_motor_value;
-
-		  HAL_Delay(1000);
-	  }
-	  else
-	  {
-		  set_turn_values(turn_value, &right_motor_value, &left_motor_value, &direction_left_front, &direction_right_front, &direction_left_rear, &direction_right_rear);
-
-		  set_direction(IN1_GPIO_Port, IN1_Pin, IN2_GPIO_Port, IN2_Pin, direction_right_front);
-		  set_direction(IN3_GPIO_Port, IN3_Pin, IN4_GPIO_Port, IN4_Pin, direction_left_front);
-
-		  set_direction(IN1REAR_GPIO_Port, IN1REAR_Pin, IN2REAR_GPIO_Port, IN2REAR_Pin, direction_left_rear);
-		  set_direction(IN3REAR_GPIO_Port, IN3REAR_Pin, IN4REAR_GPIO_Port, IN4REAR_Pin, direction_right_rear);
-
-		  TIM2->CCR3 = right_motor_value;
-		  TIM8->CCR3 = left_motor_value;
-
-		  TIM2->CCR1 = left_motor_value;
-		  TIM2->CCR2 = right_motor_value;
-	  }
-
-	  /* front */
-	  pwm_start(&htim2, TIM_CHANNEL_3);
-	  pwm_start(&htim8, TIM_CHANNEL_3);
-
-	  /* rear */
-	  pwm_start(&htim2, TIM_CHANNEL_1);
-	  pwm_start(&htim2, TIM_CHANNEL_2);
-
-	  HAL_Delay(50);
-
-	  osDelay(10);
+	  vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
   /* USER CODE END MotorControlTask */
 }
 
 /* USER CODE BEGIN Header_FrontUltrasonicSensorTask */
 /**
-* @brief Function implementing the FrontUltrasonic thread.
+* @brief Function implementing the Sensor thread.
 * @param argument: Not used
 * @retval None
 */
@@ -774,47 +812,46 @@ void MotorControlTask(void const * argument)
 void FrontUltrasonicSensorTask(void const * argument)
 {
   /* USER CODE BEGIN FrontUltrasonicSensorTask */
-  int calculated_distance_for_front_sensor;
+
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS(30); /* 30 mseconds */
+
+  xLastWakeTime = xTaskGetTickCount();
+
   /* Infinite loop */
   for(;;)
   {
-	  /* TRIGGER TO LOW */
 	  write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
 	  usDelay(5);
 
-	  /* Start measurement by outputing a 10 us pulse on the trigger pin */
 	  write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_SET);
 	  usDelay(10);
 	  write_gpio_pin(Trigger_GPIO_Port, Trigger_Pin, GPIO_PIN_RESET);
 
-	  /* Pulse width on echo signal */
-	  /* we jump into capture timer callback whenever there is a rising edge or a falling edge as we set in the .ioc file*/
 	  start_capture_timer(&htim3, TIM_CHANNEL_1);
 
 	  uint32_t startTick = HAL_GetTick();
 
 	  do
 	  {
-		if (0 != icFlag)
-		{
-			break;
-		}
-	  } while( (HAL_GetTick() - startTick) < 500 );  // 500ms timeout value if no capture
+		  if (icFlag != 0)
+		  {
+			  break;
+		  }
+	  } while ((HAL_GetTick() - startTick) < 500);
 
-	  icFlag = 0; /* reset flag */
+	  icFlag = 0;
 	  stop_capture_timer(&htim3, TIM_CHANNEL_1);
-	  HAL_Delay(50);
+	  HAL_Delay(2);
 
-	  /* distance = time * sound_speed / 2 */
-
+	  int calculated_distance_for_front_sensor;
 	  if (secondEdgeTime > firstEdgeTime)
 	  {
-		calculated_distance_for_front_sensor = (int)( (secondEdgeTime - firstEdgeTime + 0.0f) * speed_of_sound );
+		  calculated_distance_for_front_sensor = (int)((secondEdgeTime - firstEdgeTime + 0.0f) * speed_of_sound);
 	  }
-
 	  else
 	  {
-		calculated_distance_for_front_sensor = 0;
+		  calculated_distance_for_front_sensor = 0;
 	  }
 
 	  xSemaphoreTake(mutex_frontSensor, portMAX_DELAY);
@@ -823,12 +860,41 @@ void FrontUltrasonicSensorTask(void const * argument)
 
 	  xSemaphoreGive(mutex_frontSensor);
 
-	  HAL_Delay(50);
+	  sensorTaskCounter++;
 	  sprintf(uartBuf, "Distance in cm is %d\n\r", + calculated_distance_for_front_sensor);
 
-	  osDelay(10);
+	  vTaskDelayUntil(&xLastWakeTime, xFrequency);
+//	  vTaskDelay(xLastWakeTime);
   }
   /* USER CODE END FrontUltrasonicSensorTask */
+}
+
+/* USER CODE BEGIN Header_UartTask */
+/**
+* @brief Function implementing the UART thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_UartTask */
+void UartTask(void const * argument)
+{
+  /* USER CODE BEGIN UartTask */
+
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS(300); /* 300 mseconds */
+
+  xLastWakeTime = xTaskGetTickCount();
+
+  /* Infinite loop */
+  for(;;)
+  {
+	  HandleUartTask(&huart2, (uint8_t *)uartBuf, sizeof(uartBuf), 100);
+
+	  uartTaskCounter++;
+
+	  vTaskDelayUntil(&xLastWakeTime, xFrequency);
+  }
+  /* USER CODE END UartTask */
 }
 
 /**
