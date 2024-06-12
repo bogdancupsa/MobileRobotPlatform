@@ -26,6 +26,7 @@
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
+typedef StaticTask_t osStaticThreadDef_t;
 /* USER CODE BEGIN PTD */
 
 /* USER CODE END PTD */
@@ -48,9 +49,14 @@ TIM_HandleTypeDef htim8;
 
 /* Definitions for defaultTask */
 osThreadId_t defaultTaskHandle;
+uint32_t defaultTaskBuffer[ 128 ];
+osStaticThreadDef_t defaultTaskControlBlock;
 const osThreadAttr_t defaultTask_attributes = {
   .name = "defaultTask",
-  .stack_size = 128 * 4,
+  .cb_mem = &defaultTaskControlBlock,
+  .cb_size = sizeof(defaultTaskControlBlock),
+  .stack_mem = &defaultTaskBuffer[0],
+  .stack_size = sizeof(defaultTaskBuffer),
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
@@ -538,11 +544,20 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
+
+	 TickType_t xLastWakeTime;
+	 const TickType_t xFrequency = pdMS_TO_TICKS(25); /* 25 mseconds */
+
+	  xLastWakeTime = xTaskGetTickCount();
+
   /* Infinite loop */
   for(;;)
   {
 	state_machine();
-    osDelay(OS_DELAY_MS);
+
+	vTaskDelayUntil(&xLastWakeTime, xFrequency);
+
+	//osDelay(OS_DELAY_MS);
   }
   /* USER CODE END 5 */
 }
