@@ -1,0 +1,1 @@
+change tcp ports (3333 and 3334) and add the names of the board in the debugger conifguration
