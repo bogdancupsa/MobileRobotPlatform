@@ -78,7 +78,6 @@ osStaticThreadDef_t SensorControlBlock;
 osThreadId UARTHandle;
 uint32_t UARTBuffer[ 128 ];
 osStaticThreadDef_t UARTControlBlock;
-
 /* USER CODE BEGIN PV */
 
 uCAN_MSG txMessage;
@@ -131,7 +130,7 @@ char     uartBuf[UART_BUFFER_SIZE];
 int uartTaskCounter;
 int motorTaskCounter;
 int sensorTaskCounter;
-
+int ret;
 /* USER CODE END 0 */
 
 /**
@@ -183,7 +182,6 @@ int main(void)
 
   mutex_frontSensor = xSemaphoreCreateMutex();
 
-  int ret;
   ret = CANSPI_Initialize();
 
   if (ret < 0)
@@ -625,6 +623,7 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
@@ -633,10 +632,13 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, IN4REAR_Pin|IN1REAR_Pin|IN2REAR_Pin|IN3REAR_Pin
-                          |IN4_Pin|IN3_Pin|SPI3_CS_CAN_Pin, GPIO_PIN_RESET);
+                          |IN4_Pin|IN3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(IN2_GPIO_Port, IN2_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(SPI3_CS_CAN_GPIO_Port, SPI3_CS_CAN_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : BUTTON_Pin */
   GPIO_InitStruct.Pin = BUTTON_Pin;
